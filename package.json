@@ -14,8 +14,9 @@
     "y2s": "./bin/y2s.js"
   },
   "scripts": {
-    "build": "tsc -p .",
-    "prepublishOnly": "npm run build"
+    "build": "NODE_ENV=production tsc -p .",
+    "prepublishOnly": "npm run build",
+    "start": "ts-node bin/y2s.ts"
   },
   "devDependencies": {
     "@types/fs-extra": "^9.0.1",

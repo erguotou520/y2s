@@ -10,6 +10,7 @@ module.exports = {
   apiPrefix: 'https://yapi.your.company',
   token: 'token',
   projectId: 12,
+  outputPath: 'src/services',
 }
 ```
 

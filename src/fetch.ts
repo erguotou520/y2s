@@ -1,12 +1,18 @@
 import axios from 'axios'
-import { writeFileSync } from 'fs-extra'
+import { writeFileSync, ensureDirSync, existsSync } from 'fs-extra'
 import { join, resolve } from 'path'
+import { writeToFile } from './file'
 import { ConfigRC } from './types'
 
-export async function fetchJson(config: ConfigRC): { [key: string]: any } {
+export async function fetchJson(config: ConfigRC): Promise<{ [key: string]: any } | undefined> {
+  const { apiPrefix, projectId, token, outputPath = 'src/services' } = config
+  let res
   try {
-    const { apiPrefix, projectId, token, outputPath = '/src/services' } = config
-    const res = await axios.get(join(apiPrefix, '/api/plugin/export'), {
+    res = await axios.get('/api/plugin/export', {
+      baseURL: apiPrefix,
+      responseType: 'json',
+      timeout: 60,
+      timeoutErrorMessage: 'Yapi接口请求超时',
       params: {
         type: 'json',
         pid: projectId,
@@ -15,13 +21,16 @@ export async function fetchJson(config: ConfigRC): { [key: string]: any } {
         token: token,
       },
     })
-    if (res.status >= 200 && res.status < 300) {
-      const apiFile = resolve(process.cwd(), outputPath, 'api.json')
-      writeFileSync(apiFile, res.data, { encoding: 'utf8' })
-    }
   } catch (error) {
     console.error('接口数据获取出错，请尝试检查配置')
     console.error(error)
     process.exit(-1)
+  }
+  if (res.status >= 200 && res.status < 300) {
+    const serviceFolder = resolve(process.cwd(), outputPath)
+    const apiFile = resolve(serviceFolder, 'api.json')
+    ensureDirSync(serviceFolder)
+    await writeToFile(apiFile, res.data, 'api.json文件已存在，是否覆盖？')
+    return res.data
   }
 }
