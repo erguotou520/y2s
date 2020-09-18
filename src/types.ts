@@ -7,29 +7,80 @@ export interface ConfigRC {
 
 export type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'HEAD' | 'OPTIONS' | 'PATCH'
 
-// export interface
+export interface QueryPath {
+  path: string
+  params: any[]
+}
+
+export interface ReqParam {
+  _id: string
+  name: string
+  example?: string
+  desc?: string
+}
+
+export interface ReqQuery {
+  required: string
+  _id: string
+  name: string
+  example?: string
+  desc?: string
+}
+
+export interface ReqHeader {
+  required: string
+  _id: string
+  name: string
+  value?: string
+}
+
+export interface ReqBodyForm {
+  required: string
+  _id: string
+  name: string
+  type: string
+  example?: string
+  desc?: string
+}
+
+export interface List {
+  query_path: QueryPath
+  edit_uid: number
+  status: 'done' | 'undone'
+  type: string
+  req_body_is_json_schema: boolean
+  res_body_is_json_schema: boolean
+  api_opened: boolean
+  index: number
+  tag: string[]
+  _id: number
+  method: Method
+  catid: number
+  title: string
+  path: string
+  project_id: number
+  req_params: ReqParam[]
+  res_body_type: string
+  req_query: ReqQuery[]
+  req_headers: ReqHeader[]
+  req_body_form: ReqBodyForm[]
+  desc?: string
+  markdown?: string
+  res_body: 'json' | 'raw'
+  uid: number
+  add_time: number
+  up_time: number
+  __v: number
+  req_body_type: 'form' | 'json' | 'file' | 'raw'
+}
 
 export interface ApiDesc {
-  query_path: {
-    path: string
-    params: string[]
-  }
-  status: 'undone' | 'done'
-  method: Method
-  title: string
-  desc: string
-  path: string
-  req_params: string[]
-  req_query: []
-  res_body: {}
-  up_time: number
-}
-
-export interface ApiCategoryDesc {
+  index: number
   name: string
-  desc: string
+  desc?: string
+  add_time: number
   up_time: number
-  list: []
+  list: List[]
 }
 
-export interface ApiConfig {}
+export type Apis = ApiDesc[]

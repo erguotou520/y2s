@@ -1,5 +1,5 @@
 #!/usr/bin/env node
 'use strict'
 
-const { run } = require(process.env.NODE_ENV === 'production' ? '../dist' : '../src')
+const { run } = require('../src')
 run(process.argv.slice(2))

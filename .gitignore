@@ -1,2 +1,6 @@
 node_modules
 dist
+.y2src.js
+src/services
+bin/y2s.js
+yarn-error.log
