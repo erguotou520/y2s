@@ -74,7 +74,7 @@ export interface List {
   req_body_type: 'form' | 'json' | 'file' | 'raw'
 }
 
-export interface ApiDesc {
+export interface OriginApiDesc {
   index: number
   name: string
   desc?: string
@@ -83,4 +83,5 @@ export interface ApiDesc {
   list: List[]
 }
 
-export type Apis = ApiDesc[]
+export type OriginApis = OriginApiDesc[]
+
