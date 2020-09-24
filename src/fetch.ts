@@ -66,7 +66,7 @@ export function minifyJson(apis: any) {
   })
 }
 
-export async function fetchJson(config: ConfigRC): Promise<any> {
+export async function fetchJson(config: ConfigRC, overwrite = false): Promise<any> {
   const { apiPrefix, projectId, token, outputPath = 'src/services' } = config
   const spinner = ora({ text: 'Downloading api json', spinner: 'bouncingBar' }).start()
   let res
@@ -96,7 +96,7 @@ export async function fetchJson(config: ConfigRC): Promise<any> {
     const serviceFolder = resolve(process.cwd(), outputPath)
     const apiFile = resolve(serviceFolder, 'api.min.json')
     ensureDirSync(serviceFolder)
-    await writeToFile(apiFile, JSON.stringify(minifyJson(apis)), 'api.min.json文件已存在，是否覆盖？')
+    await writeToFile(apiFile, JSON.stringify(minifyJson(apis)), 'api.min.json文件已存在，是否覆盖？', overwrite)
     return apis
   }
 }

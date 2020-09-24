@@ -5,11 +5,13 @@ import { prompt } from 'inquirer'
 /**
  * 写文件
  * @param filePath 要写文件的路径
+ * @param content 要写入的字符串
  * @param rewriteMsg 文件已存在时的提示语
+ * @param overwrite 是否直接覆盖内容
  */
-export async function writeToFile(filePath: string, content: string, rewriteMsg?: string): Promise<boolean> {
+export async function writeToFile(filePath: string, content: string, rewriteMsg?: string, overwrite = false): Promise<boolean> {
   try {
-    if (existsSync(filePath)) {
+    if (existsSync(filePath) && !overwrite) {
       const ret = await prompt({
         type: 'confirm',
         name: 'rewrite',
