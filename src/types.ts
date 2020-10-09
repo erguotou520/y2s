@@ -2,7 +2,7 @@ export interface ConfigRC {
   apiPrefix: string
   token: string
   projectId: number
-  outputPath?: string
+  outputPath: string
 }
 
 export type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'HEAD' | 'OPTIONS' | 'PATCH'
@@ -84,4 +84,3 @@ export interface OriginApiDesc {
 }
 
 export type OriginApis = OriginApiDesc[]
-

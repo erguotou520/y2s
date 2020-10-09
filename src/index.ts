@@ -4,9 +4,11 @@ import { update } from './update'
 
 export function run(_args: string[]) {
   const [service, otherArgs] = parseArgs(_args)
+  // 是否有覆写参数
+  const overwrite = otherArgs.includes('-y')
   if (service === 'init') {
-    init()
+    init(overwrite)
   } else if (service === 'update') {
-    update(otherArgs)
+    update(overwrite)
   }
 }

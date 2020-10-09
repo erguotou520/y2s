@@ -1,20 +1,18 @@
 import { existsSync } from 'fs-extra'
-import { resolve } from 'path'
+import { configFilePath } from './file'
 import { ConfigRC } from './types'
 import { isNumber, isObject, isString } from './utils'
-
-const pwd = process.cwd()
-export const configFile = resolve(pwd, '.y2src.js')
 
 // 读取配置
 export function readConfig(): ConfigRC | undefined {
   try {
-    if (!existsSync(configFile)) {
+    if (!existsSync(configFilePath)) {
       console.error('.y2src.js文件不存在，请先创建，或者使用y2s init命令生成')
       process.exit(-1)
     }
-    const config = require(configFile)
+    const config = require(configFilePath)
     if (isObject(config) && isString(config.apiPrefix) && isString(config.token) && isNumber(config.projectId)) {
+      config.outputPath = config.outputPath ?? 'src/services'
       return config as ConfigRC
     }
   } catch (error) {

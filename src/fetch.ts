@@ -1,72 +1,64 @@
 import axios from 'axios'
-import { ensureDirSync } from 'fs-extra'
-import { resolve } from 'path'
 import ora from 'ora'
+import { OriginApis, ConfigRC, Method } from './types'
+// import { JSONSchema4 } from 'json-schema'
 import { writeToFile } from './file'
-import { OriginApis, ConfigRC } from './types'
-import { JSONSchema4 } from 'json-schema'
 
-export function transformJson(apis: OriginApis) {
-  return apis.map(group => {
-    return {
-      name: group.name,
-      desc: group.desc,
-      upTime: group.up_time,
-      list: group.list.map(api => {
-        const resBody: JSONSchema4 = api.res_body ? JSON.parse(api.res_body) : {}
-        return {
-          path: api.path,
-          method: api.method,
-          title: api.title,
-          desc: api.desc,
-          status: api.status,
-          upTime: api.up_time,
-          reqBodyType: api.req_body_type,
-          reqParams: api.req_params.map(params => {
-            return { name: params.name }
-          }),
-          reqQuery: api.req_query.map(query => {
-            return {
-              required: +query.required > 0,
-              name: query.name,
-              desc: query.desc
-            }
-          }),
-          reqBodyForm: api.req_body_form.map(body => {
-            return {
-              required: +body.required > 0,
-              name: body.name,
-              desc: body.desc,
-              type: body.type
-            }
-          }),
-          resBody: resBody.properties
-        }
-      })
-    }
-  })
-}
+// interface Apis {
+//   name: string
+//   desc?: string
+//   upTime: string
+//   list: {
+//     path: string
+//     method: Method
+//     title: string
+//     desc?: string
+//     status:
+//   }[]
+// }[]
 
-export function minifyJson(apis: any) {
-  return apis.map((group: { name: any; list: any[] }) => {
-    return {
-      name: group.name,
-      list: group.list.map(api => {
-        return {
-          t: api.title,
-          s: api.status,
-          m: api.method,
-          path: api.path,
-          q: api.reqQuery.map((query: { name: any; required: any }) => ({ n: query.name, r: query.required ? '1' : '0'})),
-          p: api.reqParams.map((param: { name: any }) => ({ n: param.name }))
-        }
-      })
+// export function transformJson(apis: OriginApis): Apis {
+//   return apis.map(group => {
+//     return {
+//       name: group.name,
+//       desc: group.desc,
+//       upTime: group.up_time,
+//       list: group.list.map(api => {
+//         const resBody: JSONSchema4 = api.res_body ? JSON.parse(api.res_body) : {}
+//         return {
+//           path: api.path,
+//           method: api.method,
+//           title: api.title,
+//           desc: api.desc,
+//           status: api.status,
+//           upTime: api.up_time,
+//           reqBodyType: api.req_body_type,
+//           reqParams: api.req_params.map(params => {
+//             return { name: params.name }
+//           }),
+//           reqQuery: api.req_query.map(query => {
+//             return {
+//               required: +query.required > 0,
+//               name: query.name,
+//               desc: query.desc,
+//             }
+//           }),
+//           reqBodyForm: api.req_body_form.map(body => {
+//             return {
+//               required: +body.required > 0,
+//               name: body.name,
+//               desc: body.desc,
+//               type: body.type,
+//             }
+//           }),
+//           resBody: resBody.properties,
+//         }
+//       }),
+//     }
+//   })
+// }
 
-    }
-  })
-}
-
-export async function fetchJson(config: ConfigRC, overwrite = false): Promise<any> {
+export async function fetchJson(config: ConfigRC): Promise<OriginApis | undefined> {
   const { apiPrefix, projectId, token, outputPath = 'src/services' } = config
   const spinner = ora({ text: 'Downloading api json', spinner: 'bouncingBar' }).start()
   let res
@@ -92,11 +84,8 @@ export async function fetchJson(config: ConfigRC, overwrite = false): Promise<an
   }
   spinner.stop()
   if (res.status >= 200 && res.status < 300) {
-    const apis = transformJson(res.data as OriginApis)
-    const serviceFolder = resolve(process.cwd(), outputPath)
-    const apiFile = resolve(serviceFolder, 'api.min.json')
-    ensureDirSync(serviceFolder)
-    await writeToFile(apiFile, JSON.stringify(minifyJson(apis)), 'api.min.json文件已存在，是否覆盖？', overwrite)
-    return apis
+    await writeToFile('./services/api.json', JSON.stringify(res.data, null, 2), undefined, true)
+    // const apis = transformJson(res.data as OriginApis)
+    return res.data as OriginApis
   }
 }
