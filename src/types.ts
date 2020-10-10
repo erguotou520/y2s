@@ -3,6 +3,7 @@ export interface ConfigRC {
   token: string
   projectId: number
   outputPath: string
+  saveJson?: boolean
 }
 
 export type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'HEAD' | 'OPTIONS' | 'PATCH'

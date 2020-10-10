@@ -11,6 +11,8 @@ module.exports = {
   token: 'token',
   projectId: 12,
   outputPath: 'src/services',
+  // 是否保存api.json文件
+  saveJson: true,
 }
 ```
 

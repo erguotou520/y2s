@@ -1,3 +1,5 @@
+import { JSONSchema4, JSONSchema4TypeName } from 'json-schema'
+
 const STRING_PROTOTYPE = '[object String]'
 const NUMBER_PROTOTYPE = '[object Number]'
 const REGEXP_PROTOTYPE = '[object RegExp]'
@@ -41,4 +43,50 @@ export function isObject(obj: any) {
 
 export function isFunction(fn: any) {
   return protoString(fn) === FUNCTION_PROTOTYPE
+}
+
+// 给有内容的字符串前后加空格
+export function wrapSpace(str?: string | undefined) {
+  if (!str) return ''
+  if (str.length) {
+    return ` ${str} `
+  }
+}
+
+const typeMap: {
+  [key in JSONSchema4TypeName]: string
+} = {
+  number: 'number',
+  integer: 'number',
+  string: 'string',
+  boolean: 'boolean',
+  null: 'null',
+  any: 'any',
+  array: 'array',
+  object: 'object',
+}
+
+export function converJSONSchemaToResponseStruct(json: JSONSchema4): string {
+  let type
+  if (typeof json.type === 'string') {
+    type = json.type
+  } else {
+    type = json.type?.[0]
+  }
+  type = type === 'integer' ? 'number' : type ?? 'any'
+  if (json.type === 'object') {
+    const requiredFields = (json.required || []) as string[]
+    return `{${wrapSpace(
+      Object.keys(json.properties!)
+        .map(key => {
+          const prop = json.properties![key]
+          return `${key}${requiredFields.includes(key) ? '' : '?'}: ${converJSONSchemaToResponseStruct(prop)}`
+        })
+        .join('; ')
+    )}}`
+  }
+  if (json.type === 'array') {
+    return `${converJSONSchemaToResponseStruct(json.items!)}[]`
+  }
+  return type
 }

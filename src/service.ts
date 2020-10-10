@@ -1,27 +1,6 @@
 import { JSONSchema4 } from 'json-schema'
 import { Method, OriginApis } from './types'
 
-export function minifyJson(apis: any) {
-  return apis.map((group: { name: any; list: any[] }) => {
-    return {
-      name: group.name,
-      list: group.list.map(api => {
-        return {
-          t: api.title,
-          s: api.status,
-          m: api.method,
-          path: api.path,
-          q: api.reqQuery.map((query: { name: any; required: any }) => ({
-            n: query.name,
-            r: query.required ? '1' : '0',
-          })),
-          p: api.reqParams.map((param: { name: any }) => ({ n: param.name })),
-        }
-      }),
-    }
-  })
-}
-
 interface ServiceConvertResult {
   [key: string]: {
     url: string
@@ -32,16 +11,19 @@ interface ServiceConvertResult {
     }[]
     params?: string[]
     body?: {
-      [key: string]: any
-    }
-    resp: any
+      name: string
+      type: 'text' | 'file'
+      required?: boolean
+    }[]
+    resp?: JSONSchema4
+    done: boolean
   }
 }
 
 export function convertApiToService(apis: OriginApis): ServiceConvertResult {
   return apis.reduce<ServiceConvertResult>((ret, group) => {
     group.list.forEach(api => {
-      const resBody: JSONSchema4 = api.res_body ? JSON.parse(api.res_body) : {properties:{}}
+      const resBody: JSONSchema4 = api.res_body ? JSON.parse(api.res_body) : { properties: {} }
       ret[`${group.name}@${api.title}`] = {
         url: api.path,
         method: api.method,
@@ -59,8 +41,17 @@ export function convertApiToService(apis: OriginApis): ServiceConvertResult {
               return arr
             }, [])
           : [],
-        body: {},
-        resp: resBody.properties,
+        body: api.req_body_form
+          ? api.req_body_form.map(body => {
+              return {
+                name: body.name,
+                type: body.type as 'text' | 'file',
+                required: Number(body.required) > 0,
+              }
+            })
+          : [],
+        resp: resBody,
+        done: api.status === 'done',
       }
     })
     return ret

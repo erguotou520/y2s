@@ -9,6 +9,7 @@ export const configFilePath = resolve(pwd, '.y2src.js')
 export let serviceFilePath: string
 export let apiDescriptionFilePath: string
 export let apisFilePath: string
+export let apiJsonFilePath: string
 
 /**
  * 初始化service目录的相关文件的存储路径
@@ -19,6 +20,7 @@ export function initFilePath(outputPath: string) {
   serviceFilePath = resolve(serviceFolder, 'yapi.services.ts')
   apiDescriptionFilePath = resolve(serviceFolder, 'yapi.api.d.ts')
   apisFilePath = resolve(serviceFolder, 'yapi.apis.ts')
+  apiJsonFilePath = resolve(serviceFolder, 'api.json')
 }
 
 /**

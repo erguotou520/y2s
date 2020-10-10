@@ -17,6 +17,7 @@
     "build": "tsc --outFile bin/y2s.js bin/y2s.ts && tsc && sed -i '' 's/src/dist/' bin/y2s.js",
     "prepublishOnly": "npm run build",
     "start": "ts-node bin/y2s.ts",
+    "demo": "ts-node src/demo/index.ts",
     "commit": "git-cz"
   },
   "devDependencies": {
