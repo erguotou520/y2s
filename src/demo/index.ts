@@ -34,8 +34,9 @@ const services = createServices(
   }
 )
 
+export default services
+
 async function test() {
-  // const { error, data } = await services['用户@用户列表']({ page: 1, pageSize: 20 })
   const { error, data } = await services['用户@用户详情']({ id: 123 })
   return error ? false : data
 }

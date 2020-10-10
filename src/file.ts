@@ -20,7 +20,7 @@ export function initFilePath(outputPath: string) {
   serviceFilePath = resolve(serviceFolder, 'yapi.services.ts')
   apiDescriptionFilePath = resolve(serviceFolder, 'yapi.api.d.ts')
   apisFilePath = resolve(serviceFolder, 'yapi.apis.ts')
-  apiJsonFilePath = resolve(serviceFolder, 'api.json')
+  apiJsonFilePath = resolve(serviceFolder, 'yapi.api.json')
 }
 
 /**

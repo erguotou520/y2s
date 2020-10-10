@@ -1,8 +1,14 @@
 export const initConfigFileTemplate = `module.exports = {
+  // yapi prefix yapi地址前缀
   apiPrefix: 'https://yapi.your.company',
+  // yapi project's token yapi的项目token
   token: 'token',
-  projectId: 1,
-  outputPath: 'src/services'
+  // yapi projects's id yapi的项目id
+  projectId: 12,
+  // folder to save service files 生成的service相关文件的存储位置
+  outputPath: 'src/services',
+  // wether to save the origin yapi api json response to file 是否保存api.json文件
+  saveJson: true,
 }
 `
 

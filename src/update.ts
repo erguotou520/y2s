@@ -22,8 +22,13 @@ import { converJSONSchemaToResponseStruct, wrapSpace } from './utils'
 
 const FormTypeMap = { text: 'string | number | boolean', file: 'File' }
 
+interface UpdateArgs {
+  overwrite: boolean
+  usingJs: boolean
+}
+
 // 更新数据
-export async function update(overwrite: boolean) {
+export async function update({ overwrite, usingJs = false }: UpdateArgs) {
   const config = readConfig()
   if (config) {
     initFilePath(config.outputPath)

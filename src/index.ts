@@ -9,6 +9,6 @@ export function run(_args: string[]) {
   if (service === 'init') {
     init(overwrite)
   } else if (service === 'update') {
-    update(overwrite)
+    update({ overwrite, usingJs: otherArgs.includes('--js') })
   }
 }

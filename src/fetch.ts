@@ -1,7 +1,7 @@
 import axios from 'axios'
 import ora from 'ora'
 import { OriginApis, ConfigRC, Method } from './types'
-import { writeToFile } from './file'
+import { apiJsonFilePath, writeToFile } from './file'
 
 export async function fetchJson(config: ConfigRC): Promise<OriginApis | undefined> {
   const { apiPrefix, projectId, token } = config
@@ -30,7 +30,7 @@ export async function fetchJson(config: ConfigRC): Promise<OriginApis | undefine
   spinner.stop()
   if (res.status >= 200 && res.status < 300) {
     if (config.saveJson) {
-      await writeToFile('./src/services/api.json', JSON.stringify(res.data, null, 2), undefined, true)
+      await writeToFile(apiJsonFilePath, JSON.stringify(res.data, null, 2), undefined, true)
     }
     return res.data as OriginApis
   }
