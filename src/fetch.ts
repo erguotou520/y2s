@@ -84,7 +84,7 @@ export async function fetchJson(config: ConfigRC): Promise<OriginApis | undefine
   }
   spinner.stop()
   if (res.status >= 200 && res.status < 300) {
-    await writeToFile('./services/api.json', JSON.stringify(res.data, null, 2), undefined, true)
+    // await writeToFile('./src/services/api.json', JSON.stringify(res.data, null, 2), undefined, true)
     // const apis = transformJson(res.data as OriginApis)
     return res.data as OriginApis
   }

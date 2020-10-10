@@ -1,3 +1,4 @@
+import { JSONSchema4 } from 'json-schema'
 import { Method, OriginApis } from './types'
 
 export function minifyJson(apis: any) {
@@ -40,6 +41,7 @@ interface ServiceConvertResult {
 export function convertApiToService(apis: OriginApis): ServiceConvertResult {
   return apis.reduce<ServiceConvertResult>((ret, group) => {
     group.list.forEach(api => {
+      const resBody: JSONSchema4 = api.res_body ? JSON.parse(api.res_body) : {properties:{}}
       ret[`${group.name}@${api.title}`] = {
         url: api.path,
         method: api.method,
@@ -57,7 +59,8 @@ export function convertApiToService(apis: OriginApis): ServiceConvertResult {
               return arr
             }, [])
           : [],
-        resp: api.res,
+        body: {},
+        resp: resBody.properties,
       }
     })
     return ret
