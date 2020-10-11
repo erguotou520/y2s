@@ -65,24 +65,24 @@ export type CreateServiceFunction<T = unknown> = (
 ) => Promise<ServiceFunctionResponse<T>>
 `
 
-export const apisFileTemplate = `import { Apis } from './yapi.api'
+export const apisFileTemplate = `*#import { Apis } from './yapi.api'
 
-export const apis: Apis = {
+#*export const apis*#: Apis#* = {
   $$1
 }
 `
 
-export const servicesFileTemplate = `import { CreateServiceFunction, ServiceKeys, ServiceReturn } from './yapi.api'
-import { apis } from './yapi.apis'
+export const servicesFileTemplate = `*#import { CreateServiceFunction, ServiceKeys, ServiceReturn } from './yapi.api'
+#*import { apis } from './yapi.apis'
 
-export function createServices(createFunc: CreateServiceFunction): ServiceReturn {
-  const ret = {} as ServiceReturn
-  let key: ServiceKeys
+export function createServices(createFunc*#: CreateServiceFunction#*)*#: ServiceReturn#* {
+  const ret = {}*# as ServiceReturn#*
+  let key*#: ServiceKeys#*
   for (key in apis) {
     const api = apis[key]
     let url = api.u
-    // @ts-ignore
-    ret[key] = (payload: { [key: string]: any }) => {
+    *#// @ts-ignore
+    #*ret[key] = (payload*#: { [key: string]: any }#*) => {
       const body = { ...payload }
       // params
       if (api.p?.length) {
@@ -92,7 +92,7 @@ export function createServices(createFunc: CreateServiceFunction): ServiceReturn
         })
       }
       // query
-      const query: { [key: string]: any } = {}
+      const query*#: { [key: string]: any }#* = {}
       if (api.q?.length) {
         api.q.forEach(queryKey => {
           if (queryKey in payload) {
@@ -104,8 +104,13 @@ export function createServices(createFunc: CreateServiceFunction): ServiceReturn
       return createFunc(url, api.m, query, '_body' in body ? body._body : body)
     }
   }
-  return ret as ServiceReturn
+  return ret*# as ServiceReturn#*
 }
+`
+
+export const serviceDescriptionFileTemplate = `import { CreateServiceFunction, ServiceReturn } from './yapi.api'
+
+export function createServices(createFunc: CreateServiceFunction): ServiceReturn
 `
 
 export const requestAndResponseMapTemplate = `'$$k': {

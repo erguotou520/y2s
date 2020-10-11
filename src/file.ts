@@ -7,6 +7,7 @@ const pwd = process.cwd()
 export const configFilePath = resolve(pwd, '.y2src.js')
 
 export let serviceFilePath: string
+export let serviceDescriptionFilePath: string
 export let apiDescriptionFilePath: string
 export let apisFilePath: string
 export let apiJsonFilePath: string
@@ -18,6 +19,7 @@ export let apiJsonFilePath: string
 export function initFilePath(outputPath: string) {
   const serviceFolder = resolve(process.cwd(), outputPath)
   serviceFilePath = resolve(serviceFolder, 'yapi.services.ts')
+  serviceDescriptionFilePath = resolve(serviceFolder, 'yapi.services.d.ts')
   apiDescriptionFilePath = resolve(serviceFolder, 'yapi.api.d.ts')
   apisFilePath = resolve(serviceFolder, 'yapi.apis.ts')
   apiJsonFilePath = resolve(serviceFolder, 'yapi.api.json')
