@@ -45,9 +45,10 @@ export interface ServiceRequestAndResponseMap {
 
 export type ServiceReturn = {
   [P in ServiceKeys]: (
-    payload?: ServiceRequestAndResponseMap[P]['params'] &
-      ServiceRequestAndResponseMap[P]['query'] &
-      (ServiceRequestAndResponseMap[P]['body'] | { _body: ServiceRequestAndResponseMap[P]['body'] })
+    data: ServiceRequestAndResponseMap[P]['body'] &
+      ServiceRequestAndResponseMap[P]['params'] &
+      ServiceRequestAndResponseMap[P]['query'],
+    body?: ServiceRequestAndResponseMap[P]['body']
   ) => Promise<ServiceFunctionResponse<ServiceRequestAndResponseMap[P]['response']>>
 }
 
@@ -81,7 +82,7 @@ export interface ServiceFunctionResponse<T = any> {
   stack?: string | object
 }
 
-export type CreateServiceFunction<T = unknown> = (
+export type RequestAdapter<T = unknown> = (
   url: string,
   method: Method,
   query: RequestQuery,

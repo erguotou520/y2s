@@ -20,9 +20,10 @@ export interface ServiceRequestAndResponseMap {
 
 export type ServiceReturn = {
   [P in ServiceKeys]: (
-    payload?: ServiceRequestAndResponseMap[P]['params'] &
-      ServiceRequestAndResponseMap[P]['query'] &
-      (ServiceRequestAndResponseMap[P]['body'] | { _body: ServiceRequestAndResponseMap[P]['body'] })
+    data: ServiceRequestAndResponseMap[P]['body'] &
+      ServiceRequestAndResponseMap[P]['params'] &
+      ServiceRequestAndResponseMap[P]['query'],
+    body?: ServiceRequestAndResponseMap[P]['body']
   ) => Promise<ServiceFunctionResponse<ServiceRequestAndResponseMap[P]['response']>>
 }
 
@@ -56,7 +57,7 @@ export interface ServiceFunctionResponse<T = any> {
   stack?: string | object
 }
 
-export type CreateServiceFunction<T = unknown> = (
+export type RequestAdapter<T = unknown> = (
   url: string,
   method: Method,
   query: RequestQuery,
@@ -72,17 +73,17 @@ export const apisFileTemplate = `*#import { Apis } from './yapi.api'
 }
 `
 
-export const servicesFileTemplate = `*#import { CreateServiceFunction, ServiceKeys, ServiceReturn } from './yapi.api'
+export const servicesFileTemplate = `*#import { RequestAdapter, ServiceKeys, ServiceReturn } from './yapi.api'
 #*import { apis } from './yapi.apis'
 
-export function createServices(createFunc*#: CreateServiceFunction#*)*#: ServiceReturn#* {
+export function createServices(createFunc*#: RequestAdapter#*)*#: ServiceReturn#* {
   const ret = {}*# as ServiceReturn#*
   let key*#: ServiceKeys#*
   for (key in apis) {
     const api = apis[key]
     let url = api.u
     *#// @ts-ignore
-    #*ret[key] = (payload*#: { [key: string]: any }#*) => {
+    #*ret[key] = (payload*#: { [key: string]: any }#*, _body*#?: any#*) => {
       const body = { ...payload }
       // params
       if (api.p?.length) {
@@ -101,16 +102,16 @@ export function createServices(createFunc*#: CreateServiceFunction#*)*#: Service
           }
         })
       }
-      return createFunc(url, api.m, query, '_body' in body ? body._body : body)
+      return createFunc(url, api.m, query, _body ? _body : body)
     }
   }
   return ret*# as ServiceReturn#*
 }
 `
 
-export const serviceDescriptionFileTemplate = `import { CreateServiceFunction, ServiceReturn } from './yapi.api'
+export const serviceDescriptionFileTemplate = `import { RequestAdapter, ServiceReturn } from './yapi.api'
 
-export function createServices(createFunc: CreateServiceFunction): ServiceReturn
+export function createServices(createFunc: RequestAdapter): ServiceReturn
 `
 
 export const requestAndResponseMapTemplate = `'$$k': {

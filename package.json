@@ -1,6 +1,6 @@
 {
   "name": "yapi2service",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A tool to generate api services from yapi",
   "main": "dist/index.js",
   "repository": "git@github.com:erguotou520/yapi2service.git",

@@ -113,7 +113,7 @@ Then you can use like this 那么就可以这么使用
 import services from '@/services'
 
 async function doRequest() {
-  const { error, data } = await services['group@api_title']({ ...args })
+  const { error, data } = await services['group@api_title']({ ...args }, _body)
   return error ? [] : data.items
 }
 ```

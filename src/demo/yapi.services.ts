@@ -1,14 +1,14 @@
-import { CreateServiceFunction, ServiceKeys, ServiceReturn } from './yapi.api'
+import { RequestAdapter, ServiceKeys, ServiceReturn } from './yapi.api'
 import { apis } from './yapi.apis'
 
-export function createServices(createFunc: CreateServiceFunction): ServiceReturn {
+export function createServices(createFunc: RequestAdapter): ServiceReturn {
   const ret = {} as ServiceReturn
   let key: ServiceKeys
   for (key in apis) {
     const api = apis[key]
     let url = api.u
     // @ts-ignore
-    ret[key] = (payload?: { [key: string]: any } = {}) => {
+    ret[key] = (payload?: { [key: string]: any } = {}, _body?: any) => {
       const body = { ...payload }
       // params
       if (api.p?.length) {
@@ -27,7 +27,7 @@ export function createServices(createFunc: CreateServiceFunction): ServiceReturn
           }
         })
       }
-      return createFunc(url, api.m, query, '_body' in body ? body._body : body)
+      return createFunc(url, api.m, query, _body ? _body : body)
     }
   }
   return ret as ServiceReturn

@@ -37,7 +37,7 @@ const services = createServices(
 export default services
 
 async function test() {
-  const { error, data } = await services['用户@用户详情']({ id: 123 })
+  const { error, data } = await services['用户@用户详情']({ id: 1 })
   return error ? false : data
 }
 
@@ -45,9 +45,9 @@ async function testAll() {
   await services['用户@用户列表']({ page: 1, pageSize: 20, ids: [1, 2, 3] })
   await services['用户@用户详情']({ id: 123 })
   await services['用户@修改用户信息']({ id: 123, age: 23, name: '张三', gender: 1 })
-  await services['用户@修改用户信息']({ id: 123, _body: { age: 23, name: '张三', gender: 1 } })
+  await services['用户@修改用户信息']({ id: 123 }, { age: 23, name: '张三', gender: 1 })
   await services['用户@获取用户关注的人数']({ id: 123 })
   await services['认证@登录']({ username: 'root', password: '123456', rememberMe: true })
-  await services['认证@登出']()
+  await services['认证@登出']({})
 }
 testAll()
