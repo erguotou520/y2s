@@ -78,10 +78,12 @@ export function converJSONSchemaToResponseStruct(json: JSONSchema4): string {
   if (json.type === 'object') {
     const requiredFields = (json.required || []) as string[]
     return `{${wrapSpace(
-      Object.keys(json.properties!)
+      Object.keys(json.properties || {})
         .map(key => {
           const prop = json.properties![key]
-          return `${key}${requiredFields.includes(key) ? '' : '?'}: ${converJSONSchemaToResponseStruct(prop)}`
+          return `${/^\w+$/.test(key) ? key : `'${key}'`}${
+            requiredFields.includes(key) ? '' : '?'
+          }: ${converJSONSchemaToResponseStruct(prop)}`
         })
         .join('; ')
     )}}`

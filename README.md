@@ -74,7 +74,14 @@ import { createServices } from './yapi.services'
 
 const token = localStorage.getItem('token')
 const services = createServices(
-  async (url: string, method: Method, query: RequestQuery, body: RequestBody, done = true) => {
+  async (
+    url: string,
+    method: Method,
+    query: RequestQuery,
+    body: RequestBody,
+    done = true
+    // eslint-disable-next-line max-params
+  ) => {
     const { status, data, statusText } = await axios.request({
       url,
       method,

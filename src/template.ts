@@ -18,16 +18,16 @@ export interface ServiceRequestAndResponseMap {
   $$1
 }
 
+export type ServiceKeys = keyof ServiceRequestAndResponseMap
+
 export type ServiceReturn = {
   [P in ServiceKeys]: (
-    data: ServiceRequestAndResponseMap[P]['body'] &
+    data?: ServiceRequestAndResponseMap[P]['body'] &
       ServiceRequestAndResponseMap[P]['params'] &
       ServiceRequestAndResponseMap[P]['query'],
     body?: ServiceRequestAndResponseMap[P]['body']
   ) => Promise<ServiceFunctionResponse<ServiceRequestAndResponseMap[P]['response']>>
 }
-
-export type ServiceKeys = keyof ServiceRequestAndResponseMap
 
 export type ApiDefine = {
   u: string
@@ -77,8 +77,10 @@ export const servicesFileTemplate = `*#import { RequestAdapter, ServiceKeys, Ser
 #*import { apis } from './yapi.apis'
 
 export function createServices(createFunc*#: RequestAdapter#*)*#: ServiceReturn#* {
-  const ret = {}*# as ServiceReturn#*
+  *#// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  #*const ret = {}*# as ServiceReturn#*
   let key*#: ServiceKeys#*
+  *#// eslint-disable-next-line guard-for-in#*
   for (key in apis) {
     const api = apis[key]
     let url = api.u
