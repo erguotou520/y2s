@@ -12,7 +12,7 @@ export const initConfigFileTemplate = `module.exports = {
 }
 `
 
-export const apiDescriptionFileTemplate = `export type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'HEAD' | 'OPTIONS' | 'PATCH'
+export const apiDescriptionFileTemplate = `export type Method = 'GET' | 'POST' | 'PUT' | 'DELETE'
 
 export interface ServiceRequestAndResponseMap {
   $$1
@@ -29,7 +29,7 @@ export type ServiceReturn = {
   ) => Promise<ServiceFunctionResponse<ServiceRequestAndResponseMap[P]['response']>>
 }
 
-export type ApiDefine = {
+export interface ApiDefine = {
   u: string
   m: Method
   // params
