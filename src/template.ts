@@ -29,7 +29,7 @@ export type ServiceReturn = {
   ) => Promise<ServiceFunctionResponse<ServiceRequestAndResponseMap[P]['response']>>
 }
 
-export interface ApiDefine = {
+export interface ApiDefine {
   u: string
   m: Method
   // params
