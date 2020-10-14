@@ -6,9 +6,9 @@ export function createServices(createFunc: RequestAdapter): ServiceReturn {
   let key: ServiceKeys
   for (key in apis) {
     const api = apis[key]
-    let url = api.u
     // @ts-ignore
     ret[key] = (payload?: { [key: string]: any } = {}, _body?: any) => {
+      let url = api.u
       const body = { ...payload }
       // params
       if (api.p?.length) {

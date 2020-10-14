@@ -83,9 +83,9 @@ export function createServices(createFunc*#: RequestAdapter#*)*#: ServiceReturn#
   *#// eslint-disable-next-line guard-for-in#*
   for (key in apis) {
     const api = apis[key]
-    let url = api.u
     *#// @ts-ignore
     #*ret[key] = (payload*#: { [key: string]: any }#*, _body*#?: any#*) => {
+      let url = api.u
       const body = { ...payload }
       // params
       if (api.p?.length) {
