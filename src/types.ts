@@ -14,7 +14,7 @@ export interface QueryPath {
 }
 
 export interface ReqParam {
-  _id: string
+  // _id: string
   name: string
   example?: string
   desc?: string
@@ -22,7 +22,7 @@ export interface ReqParam {
 
 export interface ReqQuery {
   required: string
-  _id: string
+  // _id: string
   name: string
   example?: string
   desc?: string
@@ -30,14 +30,14 @@ export interface ReqQuery {
 
 export interface ReqHeader {
   required: string
-  _id: string
+  // _id: string
   name: string
   value?: string
 }
 
 export interface ReqBodyForm {
   required: string
-  _id: string
+  // _id: string
   name: string
   type: string
   example?: string
@@ -54,7 +54,7 @@ export interface List {
   api_opened: boolean
   index: number
   tag: string[]
-  _id: number
+  // _id: number
   method: Method
   catid: number
   title: string

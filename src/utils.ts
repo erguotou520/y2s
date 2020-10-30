@@ -1,5 +1,5 @@
 import { JSONSchema4, JSONSchema4TypeName } from 'json-schema'
-import { Method, OriginApis } from './types'
+import { Method, OriginApis, ReqBodyForm, ReqParam, ReqQuery } from './types'
 
 const STRING_PROTOTYPE = '[object String]'
 const NUMBER_PROTOTYPE = '[object Number]'
@@ -46,12 +46,37 @@ export function isFunction(fn: any) {
   return protoString(fn) === FUNCTION_PROTOTYPE
 }
 
-// 给有内容的字符串前后加空格
-export function wrapSpace(str?: string | undefined) {
+/**
+ * 填充一定数量的空格
+ * @param count 空格数量
+ */
+export function fillSpace(count: number): string {
+  return [...Array(count)].fill(' ').join('')
+}
+
+/**
+ * 给有内容的字符串前后加空格
+ * @param str 字符串
+ */
+export function wrapSpace(str?: string) {
   if (!str) return ''
   if (str.length) {
     return ` ${str} `
   }
+}
+
+/**
+ * 给有内容的字符串前后加换行
+ * @param str 字符串
+ * @param spaceBefore 当前行锁进的空格数
+ * @param withPrefixSpace 换行后是否要追加空格
+ */
+export function wrapNewline(str: string | undefined, spaceBefore: number, withPrefixSpace = false): string {
+  if (!str) return ''
+  if (str.length) {
+    return `\n${withPrefixSpace ? fillSpace(spaceBefore + 2) : ''}${str}\n${fillSpace(spaceBefore)}`
+  }
+  return ''
 }
 
 const typeMap: {
@@ -67,6 +92,10 @@ const typeMap: {
   object: 'object',
 }
 
+/**
+ * 将Json Schema格式的返回值转换成我们需要的格式
+ * @param json json schema格式的数据
+ */
 export function converJSONSchemaToResponseStruct(json: JSONSchema4): string {
   let type
   if (typeof json.type === 'string') {
@@ -98,21 +127,18 @@ interface ServiceConvertResult {
   [key: string]: {
     url: string
     method: Method
-    query?: {
-      name: string
-      required?: boolean
-    }[]
-    params?: string[]
-    body?: {
-      name: string
-      type: 'text' | 'file'
-      required?: boolean
-    }[]
+    query?: ReqQuery[]
+    params?: ReqParam[]
+    body?: ReqBodyForm[]
     resp?: JSONSchema4
     done: boolean
   }
 }
 
+/**
+ * 将Api集合转换成service
+ * @param apis Api集合
+ */
 export function convertApiToService(apis: OriginApis): ServiceConvertResult {
   return apis.reduce<ServiceConvertResult>((ret, group) => {
     group.list.forEach(api => {
@@ -120,29 +146,9 @@ export function convertApiToService(apis: OriginApis): ServiceConvertResult {
       ret[`${group.name}@${api.title}`] = {
         url: api.path,
         method: api.method,
-        query: api.req_query
-          ? api.req_query.map(query => {
-              return {
-                name: query.name,
-                required: Number(query.required) > 0,
-              }
-            })
-          : [],
-        params: api.req_params
-          ? api.req_params.reduce<string[]>((arr, param) => {
-              arr.push(param.name)
-              return arr
-            }, [])
-          : [],
-        body: api.req_body_form
-          ? api.req_body_form.map(body => {
-              return {
-                name: body.name,
-                type: body.type as 'text' | 'file',
-                required: Number(body.required) > 0,
-              }
-            })
-          : [],
+        query: api.req_query ?? [],
+        params: api.req_params ?? [],
+        body: api.req_body_form ?? [],
         resp: resBody,
         done: api.status === 'done',
       }
@@ -161,4 +167,36 @@ export function removeJsConvertSymbols(str: string, usingJs: boolean): string {
     return str.replace(/(\*#|#\*)/g, '')
   }
   return str.replace(/\*#(([\s\S])*?)#\*/g, '')
+}
+
+interface CommentItem {
+  symbol?: string
+  key?: string
+  value?: string
+}
+
+/**
+ * 根据注释的内容生成注释字符串
+ * @param commentItems 注释的内容
+ * @param spaceBefore 当前锁进的空格的长度
+ */
+export function generateComment(commentItems: CommentItem[], spaceBefore: number): string {
+  const prefixSpace = fillSpace(spaceBefore + 2)
+  const arr = commentItems.reduce<string[]>((strs, item) => {
+    if (item.value) {
+      strs.push(
+        [prefixSpace, '*', item.symbol ? `@${item.symbol}` : '', item.key ? `{${item.key}}` : '', item.value ?? '']
+          // 过滤空字符串
+          .filter(item => item)
+          .join(' ')
+      )
+    }
+    return strs
+  }, [])
+  // 空内容
+  if (!arr.length) return ''
+  arr.unshift(`${prefixSpace}/**`)
+  arr.push(`${prefixSpace} */`)
+  arr.push(prefixSpace)
+  return arr.join('\n')
 }

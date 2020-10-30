@@ -84,7 +84,7 @@ export function createServices(createFunc*#: RequestAdapter#*)*#: ServiceReturn#
   for (key in apis) {
     const api = apis[key]
     *#// @ts-ignore
-    #*ret[key] = (payload*#: { [key: string]: any }#*, _body*#?: any#*) => {
+    #*ret[key] = (payload*#: { [key: string]: any }#*, extraParams*#?: any#*) => {
       let url = api.u
       const body = { ...payload }
       // params
@@ -104,7 +104,7 @@ export function createServices(createFunc*#: RequestAdapter#*)*#: ServiceReturn#
           }
         })
       }
-      return createFunc(url, api.m, query, _body ? _body : body)
+      return createFunc(url, api.m, query, body, extraParams)
     }
   }
   return ret*# as ServiceReturn#*

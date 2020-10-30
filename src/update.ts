@@ -8,7 +8,7 @@ import {
   serviceFilePath,
   writeToFile,
 } from './file'
-import { convertApiToService, removeJsConvertSymbols } from './utils'
+import { convertApiToService, generateComment, removeJsConvertSymbols, wrapNewline } from './utils'
 import {
   apiDescriptionFileTemplate,
   apisFileTemplate,
@@ -24,6 +24,23 @@ const FormTypeMap = { text: 'string | number | boolean', file: 'File' }
 interface UpdateArgs {
   overwrite: boolean
   usingJs: boolean
+}
+
+interface CommonCommentItem {
+  name: string
+  desc?: string
+  example?: string
+}
+
+/**
+ * 为通用对象生成注释
+ * @param item 待生成注释的对象
+ */
+export function generateCommonComment(item: CommonCommentItem): string {
+  return generateComment(
+    [{ value: item.desc }, { symbol: 'example', value: item.example ? `{ ${item.name}: ${item.example} }` : '' }],
+    4
+  )
 }
 
 // 更新数据
@@ -59,19 +76,45 @@ export async function update({ overwrite, usingJs = false }: UpdateArgs) {
               arr.push(
                 requestAndResponseMapTemplate
                   .replace('$$k', key)
-                  .replace('$$p', wrapSpace(api.params?.map(p => `${p}: any;`).join(' ')) ?? '')
+                  // params
                   .replace(
-                    '$$q',
-                    wrapSpace(api.query?.map(q => `${q.name}${q.required ? '' : '?'}: any;`).join(' ')) ?? ''
-                  )
-                  .replace(
-                    '$$b',
-                    wrapSpace(
-                      api.body
-                        ?.map(b => `${b.name}${b.required ? '' : '?'}: ${FormTypeMap[b.type] ?? 'any'}`)
-                        .join('; ')
+                    '$$p',
+                    wrapNewline(
+                      api.params
+                        ?.map(p => {
+                          return `${generateCommonComment(p)}${p.name}: any;`
+                        })
+                        .join('\n'),
+                      4
                     ) ?? ''
                   )
+                  // query
+                  .replace(
+                    '$$q',
+                    wrapNewline(
+                      api.query
+                        ?.map(q => {
+                          return `${generateCommonComment(q)}${q.name}${Number(q.required) > 0 ? '' : '?'}: any;`
+                        })
+                        .join('\n'),
+                      4
+                    ) ?? ''
+                  )
+                  // body
+                  .replace(
+                    '$$b',
+                    wrapNewline(
+                      api.body
+                        ?.map(b => {
+                          return `${generateCommonComment(b)}${b.name}${Number(b.required) > 0 ? '' : '?'}: ${
+                            FormTypeMap[b.type as 'file' | 'text'] ?? 'any'
+                          }`
+                        })
+                        .join('\n'),
+                      4
+                    ) ?? ''
+                  )
+                  // response
                   .replace('$$r', converJSONSchemaToResponseStruct(api.resp || {}))
               )
               return arr

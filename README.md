@@ -120,13 +120,10 @@ Then you can use like this 那么就可以这么使用
 import services from '@/services'
 
 async function doRequest() {
-  const { error, data } = await services['group@api_title']({ ...args }, _body)
+  const { error, data } = await services['group@api_title']({ ...args }, extraParams)
   return error ? [] : data.items
 }
 ```
-
-There is a field named `_body` in the request arguments which is a fallback way to avoid duplicated key in body and querystring/params, when passing `_body` the request body will be the `_body` value.
-在参数里有一个`_body`参数，这是为了防止 body 和 querystring/params 存在重复 key 的情况，当使用`_body`时，那么真实请求的 body 内容将是`_body`的值。
 
 ## Screenshot 使用截图
 

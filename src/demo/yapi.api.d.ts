@@ -4,7 +4,15 @@ export interface ServiceRequestAndResponseMap {
   '用户@修改用户信息': {
     params: { id: any }
     query: {}
-    body: { name?: string | number | boolean; gender?: string | number | boolean; age?: string | number | boolean }
+    body: {
+      /**
+       * 安德森
+       * @description 名称
+       */
+      name?: string | number | boolean
+      gender?: string | number | boolean
+      age?: string | number | boolean
+    }
     response: { name?: string; gender?: string; age?: number; id?: string }
   }
   '用户@用户列表': {

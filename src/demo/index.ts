@@ -44,7 +44,7 @@ async function test() {
 async function testAll() {
   await services['用户@用户列表']({ page: 1, pageSize: 20, ids: [1, 2, 3] })
   await services['用户@用户详情']({ id: 123 })
-  await services['用户@修改用户信息']({ id: 123, age: 23, name: '张三', gender: 1 })
+  await services['用户@修改用户信息']({ id: 12, name: '1', gender: '' })
   await services['用户@修改用户信息']({ id: 123 }, { age: 23, name: '张三', gender: 1 })
   await services['用户@获取用户关注的人数']({ id: 123 })
   await services['认证@登录']({ username: 'root', password: '123456', rememberMe: true })
