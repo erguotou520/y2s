@@ -140,7 +140,10 @@ export async function update({ overwrite, usingJs = false }: UpdateArgs) {
                   .replace('$$k', key)
                   .replace('$$u', api.url)
                   .replace('$$m', api.method)
-                  .replace('$$p', api.params?.length ? `p: ['${api.params.join("', '")}'],\n    ` : '')
+                  .replace(
+                    '$$p',
+                    api.params?.length ? `p: ['${api.params.map(param => param.name).join("', '")}'],\n    ` : ''
+                  )
                   .replace('$$q', api.query?.length ? `q: ['${api.query.map(q => q.name).join("', '")}'],\n    ` : '')
                   .replace('$$d', api.done ? '1' : '0')
               })
