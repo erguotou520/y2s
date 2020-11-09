@@ -38,7 +38,10 @@ interface CommonCommentItem {
  */
 export function generateCommonComment(item: CommonCommentItem): string {
   return generateComment(
-    [{ value: item.desc }, { symbol: 'example', value: item.example ? `{ ${item.name}: ${item.example} }` : '' }],
+    [
+      { symbol: 'description', value: item.desc },
+      { symbol: 'example', value: item.example ? `{ ${item.name}: ${item.example} }` : '' },
+    ],
     4
   )
 }
@@ -115,7 +118,7 @@ export async function update({ overwrite, usingJs = false }: UpdateArgs) {
                     ) ?? ''
                   )
                   // response
-                  .replace('$$r', converJSONSchemaToResponseStruct(api.resp || {}))
+                  .replace('$$r', converJSONSchemaToResponseStruct(api.resp || {}, 4))
               )
               return arr
             }, [])

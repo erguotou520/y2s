@@ -96,7 +96,7 @@ const typeMap: {
  * 将Json Schema格式的返回值转换成我们需要的格式
  * @param json json schema格式的数据
  */
-export function converJSONSchemaToResponseStruct(json: JSONSchema4): string {
+export function converJSONSchemaToResponseStruct(json: JSONSchema4, spaceBefore: number): string {
   let type
   if (typeof json.type === 'string') {
     type = json.type
@@ -106,19 +106,29 @@ export function converJSONSchemaToResponseStruct(json: JSONSchema4): string {
   type = type === 'integer' ? 'number' : type ?? 'any'
   if (json.type === 'object') {
     const requiredFields = (json.required || []) as string[]
-    return `{${wrapSpace(
+    return `{${wrapNewline(
       Object.keys(json.properties || {})
         .map(key => {
           const prop = json.properties![key]
-          return `${/^\w+$/.test(key) ? key : `'${key}'`}${
-            requiredFields.includes(key) ? '' : '?'
-          }: ${converJSONSchemaToResponseStruct(prop)}`
+          // 注释
+          const comments = generateComment(
+            [{ value: prop.title }, { symbol: 'description', value: prop.description }],
+            spaceBefore
+          )
+          // key
+          const fieldKey = /^\w+$/.test(key) ? key : `'${key}'`
+          // 如果非纯字母+数字，需要套一层引号
+          return `${comments}${fieldKey}${requiredFields.includes(key) ? '' : '?'}: ${converJSONSchemaToResponseStruct(
+            prop,
+            spaceBefore + 2
+          )}`
         })
-        .join('; ')
+        .join('\n'),
+      spaceBefore
     )}}`
   }
   if (json.type === 'array') {
-    return `${converJSONSchemaToResponseStruct(json.items!)}[]`
+    return `${converJSONSchemaToResponseStruct(json.items!, spaceBefore)}[]`
   }
   return type
 }
@@ -194,7 +204,7 @@ export function generateComment(commentItems: CommentItem[], spaceBefore: number
     return strs
   }, [])
   // 空内容
-  if (!arr.length) return ''
+  if (!arr.length) return prefixSpace
   arr.unshift(`${prefixSpace}/**`)
   arr.push(`${prefixSpace} */`)
   arr.push(prefixSpace)
