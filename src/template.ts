@@ -62,7 +62,8 @@ export type RequestAdapter<T = unknown> = (
   method: Method,
   query: RequestQuery,
   body: RequestBody,
-  done?: boolean
+  extraParams: any,
+  done: boolean
 ) => Promise<ServiceFunctionResponse<T>>
 `
 
@@ -104,7 +105,7 @@ export function createServices(createFunc*#: RequestAdapter#*)*#: ServiceReturn#
           }
         })
       }
-      return createFunc(url, api.m, query, body, extraParams)
+      return createFunc(url, api.m, query, body, extraParams, api.d > 0)
     }
   }
   return ret*# as ServiceReturn#*
