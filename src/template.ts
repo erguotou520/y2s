@@ -1,5 +1,4 @@
-export const initConfigFileTemplate = `// eslint-ignore
-// prettier-ignore
+export const initConfigFileTemplate = `/* eslint-ignore */
 module.exports = {
   // yapi prefix yapi地址前缀
   apiPrefix: 'https://yapi.your.company',
@@ -16,8 +15,7 @@ module.exports = {
 }
 `
 
-export const apiDescriptionFileTemplate = `// prettier-ignore
-export type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'HEAD' | 'OPTIONS' | 'PATCH'
+export const apiDescriptionFileTemplate = `export type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'HEAD' | 'OPTIONS' | 'PATCH'
 
 export interface ServiceRequestAndResponseMap {
   $$1
@@ -72,8 +70,7 @@ export type RequestAdapter<T = unknown> = (
 ) => Promise<ServiceFunctionResponse<T>>
 `
 
-export const apisFileTemplate = `// eslint-ignore
-// prettier-ignore
+export const apisFileTemplate = `/* eslint-ignore */
 *#import { Apis } from './yapi.api'
 
 #*export const apis*#: Apis#* = {
@@ -81,8 +78,7 @@ export const apisFileTemplate = `// eslint-ignore
 }
 `
 
-export const servicesFileTemplate = `// eslint-ignore
-// prettier-ignore
+export const servicesFileTemplate = `/* eslint-ignore */
 *#import { RequestAdapter, ServiceKeys, ServiceReturn } from './yapi.api'
 #*import { apis } from './yapi.apis'
 
