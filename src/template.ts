@@ -1,4 +1,4 @@
-export const initConfigFileTemplate = `/* eslint-ignore */
+export const initConfigFileTemplate = `/* eslint-disable */
 module.exports = {
   // yapi prefix yapi地址前缀
   apiPrefix: 'https://yapi.your.company',
@@ -70,7 +70,7 @@ export type RequestAdapter<T = unknown> = (
 ) => Promise<ServiceFunctionResponse<T>>
 `
 
-export const apisFileTemplate = `/* eslint-ignore */
+export const apisFileTemplate = `/* eslint-disable */
 *#import { Apis } from './yapi.api'
 
 #*export const apis*#: Apis#* = {
@@ -78,7 +78,7 @@ export const apisFileTemplate = `/* eslint-ignore */
 }
 `
 
-export const servicesFileTemplate = `/* eslint-ignore */
+export const servicesFileTemplate = `/* eslint-disable */
 *#import { RequestAdapter, ServiceKeys, ServiceReturn } from './yapi.api'
 #*import { apis } from './yapi.apis'
 
