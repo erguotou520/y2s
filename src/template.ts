@@ -95,7 +95,10 @@ export function createServices(createFunc*#: RequestAdapter#*)*#: ServiceReturn#
       if (api.p?.length) {
         api.p.forEach(paramKey => {
           delete body[paramKey]
-          url = url.replace(new RegExp(\`:\${paramKey}|{\${paramKey}}\`, 'g'), payload[paramKey])
+          url = url.replace(
+            new RegExp(\`:\${paramKey}|{\${paramKey}}\`, 'g'),
+            payload[paramKey]
+          )
         })
       }
       // query
