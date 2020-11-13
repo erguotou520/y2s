@@ -1,4 +1,6 @@
-export const initConfigFileTemplate = `module.exports = {
+export const initConfigFileTemplate = `// eslint-ignore
+// prettier-ignore
+module.exports = {
   // yapi prefix yapi地址前缀
   apiPrefix: 'https://yapi.your.company',
   // yapi project's token yapi的项目token
@@ -9,10 +11,13 @@ export const initConfigFileTemplate = `module.exports = {
   outputPath: 'src/services',
   // wether to save the origin yapi api json response to file 是否保存api.json文件
   saveJson: true,
+  // overwrite the static files? This is recommended, keep it true 是否覆盖固定生成的几个文件？一般不建议取消，保持文件最新
+  overwrite: true
 }
 `
 
-export const apiDescriptionFileTemplate = `export type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'HEAD' | 'OPTIONS' | 'PATCH'
+export const apiDescriptionFileTemplate = `// prettier-ignore
+export type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'HEAD' | 'OPTIONS' | 'PATCH'
 
 export interface ServiceRequestAndResponseMap {
   $$1
@@ -67,21 +72,23 @@ export type RequestAdapter<T = unknown> = (
 ) => Promise<ServiceFunctionResponse<T>>
 `
 
-export const apisFileTemplate = `*#import { Apis } from './yapi.api'
+export const apisFileTemplate = `// eslint-ignore
+// prettier-ignore
+*#import { Apis } from './yapi.api'
 
 #*export const apis*#: Apis#* = {
   $$1
 }
 `
 
-export const servicesFileTemplate = `*#import { RequestAdapter, ServiceKeys, ServiceReturn } from './yapi.api'
+export const servicesFileTemplate = `// eslint-ignore
+// prettier-ignore
+*#import { RequestAdapter, ServiceKeys, ServiceReturn } from './yapi.api'
 #*import { apis } from './yapi.apis'
 
 export function createServices(createFunc*#: RequestAdapter#*)*#: ServiceReturn#* {
-  *#// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  #*const ret = {}*# as ServiceReturn#*
+  const ret = {}*# as ServiceReturn#*
   let key*#: ServiceKeys#*
-  *#// eslint-disable-next-line guard-for-in#*
   for (key in apis) {
     const api = apis[key]
     *#// @ts-ignore

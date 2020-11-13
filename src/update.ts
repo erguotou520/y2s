@@ -1,3 +1,4 @@
+import { existsSync } from 'fs-extra'
 import { readConfig } from './config'
 import { fetchJson } from './fetch'
 import {
@@ -56,16 +57,16 @@ export async function update({ overwrite, usingJs = false }: UpdateArgs) {
       // 初始化service目录的相关文件的存储路径
       // 根据api获取service配置数据
       const services = convertApiToService(apiJson)
-      // 生成yapi.services.ts文件
-      await writeToFile(
-        usingJs ? serviceFilePath.replace(/\.ts$/, '.js') : serviceFilePath,
-        removeJsConvertSymbols(servicesFileTemplate, usingJs),
-        undefined,
-        overwrite
-      )
-      // js项目还需要生成yapi.services.d.ts文件
-      if (usingJs) {
-        await writeToFile(serviceDescriptionFilePath, serviceDescriptionFileTemplate, undefined, overwrite)
+      // yapi.services.ts文件名称
+      const serviceFileName = usingJs ? serviceFilePath.replace(/\.ts$/, '.js') : serviceFilePath
+      // 根据配置项来判断是否覆盖yapi.services.ts文件
+      if (config.overwrite !== false || !existsSync(serviceFileName)) {
+        // 生成yapi.services.ts文件
+        await writeToFile(serviceFileName, removeJsConvertSymbols(servicesFileTemplate, usingJs), undefined, overwrite)
+        // js项目还需要生成yapi.services.d.ts文件
+        if (usingJs) {
+          await writeToFile(serviceDescriptionFilePath, serviceDescriptionFileTemplate, undefined, overwrite)
+        }
       }
       // 生成yapi.api.d.ts文件
       const serviceKeys = Object.keys(services)

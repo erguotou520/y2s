@@ -4,6 +4,7 @@ export interface ConfigRC {
   projectId: number
   outputPath: string
   saveJson?: boolean
+  overwrite?: boolean
 }
 
 export type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'HEAD' | 'OPTIONS' | 'PATCH'

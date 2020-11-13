@@ -50,6 +50,8 @@ module.exports = {
   outputPath: 'src/services',
   // [Optional, default: false] wether to save the origin yapi api json response to file 是否保存api.json文件
   saveJson: true,
+  // [Optional, default: true] overwrite the static files(yapi.services.j/ts)? This is recommended, keep it true 是否覆盖固定生成的几个文件？一般不建议取消，保持文件最新
+  overwrite: true,
 }
 ```
 
