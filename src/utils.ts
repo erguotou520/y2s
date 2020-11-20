@@ -1,5 +1,5 @@
 import { JSONSchema4, JSONSchema4TypeName } from 'json-schema'
-import { Method, OriginApis, ReqBodyForm, ReqParam, ReqQuery } from './types'
+import { ConfigRC, Method, OriginApis, ReqBodyForm, ReqParam, ReqQuery } from './types'
 
 const STRING_PROTOTYPE = '[object String]'
 const NUMBER_PROTOTYPE = '[object Number]'
@@ -149,11 +149,35 @@ interface ServiceConvertResult {
  * 将Api集合转换成service
  * @param apis Api集合
  */
-export function convertApiToService(apis: OriginApis): ServiceConvertResult {
+export function convertApiToService(apis: OriginApis, config: ConfigRC): ServiceConvertResult {
+  const sameTitleCacheMap: {
+    [key: string]: 1
+  } = {}
   return apis.reduce<ServiceConvertResult>((ret, group) => {
     group.list.forEach(api => {
       const resBody: JSONSchema4 = api.res_body ? JSON.parse(api.res_body) : { properties: {} }
-      ret[`${group.name}@${api.title}`] = {
+      let key = `${group.name}@${api.title}`
+      // trim
+      if (config.trim) {
+        key = key.trim()
+      }
+      // 重名时试图添加method
+      const sameTitleApi = group.list.find(_api => _api !== api && _api.title === api.title)
+      if (sameTitleApi) {
+        // method也一致
+        if (sameTitleApi.method === api.method) {
+          console.error(`\x1B[41m\x1B[37mFind same api: ${group.name}@${api.title}, previous api will be overwritten!!!\x1B[0m\x1B[0m`)
+        } else {
+          // 相同title的只提示一次
+          if (!sameTitleCacheMap[key]) {
+            sameTitleCacheMap[key] = 1
+            console.warn(`\x1B[33mFind same api with different method: ${group.name}@${api.title}, will add @{method} suffix.\x1B[0m`)
+          }
+        }
+        // 添加method
+        key = `${key}@${api.method.toLowerCase()}`
+      }
+      ret[key] = {
         url: api.path,
         method: api.method,
         query: api.req_query ?? [],

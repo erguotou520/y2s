@@ -56,7 +56,7 @@ export async function update({ overwrite, usingJs = false }: UpdateArgs) {
     if (typeof apiJson !== 'undefined') {
       // 初始化service目录的相关文件的存储路径
       // 根据api获取service配置数据
-      const services = convertApiToService(apiJson)
+      const services = convertApiToService(apiJson, config)
       // yapi.services.ts文件名称
       const serviceFileName = usingJs ? serviceFilePath.replace(/\.ts$/, '.js') : serviceFilePath
       // 根据配置项来判断是否覆盖yapi.services.ts文件

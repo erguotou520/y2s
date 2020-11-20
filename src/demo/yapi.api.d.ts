@@ -1,34 +1,128 @@
+/* eslint-disable */
 export type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'HEAD' | 'OPTIONS' | 'PATCH'
 
 export interface ServiceRequestAndResponseMap {
   '用户@修改用户信息': {
-    params: { id: any }
+    params: {
+      /**
+       * @description 用户id
+       * @example { id: 123 }
+       */
+      id: any;
+    }
     query: {}
     body: {
       /**
-       * 安德森
        * @description 名称
+       * @example { name: 李四 }
        */
       name?: string | number | boolean
+      /**
+       * @description 性别
+       * @example { gender: 女 }
+       */
       gender?: string | number | boolean
+      /**
+       * @description 年龄
+       * @example { age: 34 }
+       */
       age?: string | number | boolean
     }
-    response: { name?: string; gender?: string; age?: number; id?: string }
+    response: {
+      /**
+       * @description 用户名称
+       */
+      name?: string
+      /**
+       * @description 性别
+       */
+      gender?: string
+      /**
+       * @description 年龄
+       */
+      age?: number
+      /**
+       * @description id
+       */
+      id?: string
+    }
   }
   '用户@用户列表': {
     params: {}
-    query: { page: any; pageSize: any; keyword?: any; ids?: any }
+    query: {
+      /**
+       * @description 当前页
+       * @example { page: 1 }
+       */
+      page: any;
+      pageSize: any;
+      /**
+       * @description 搜索关键词
+       * @example { keyword: 张 }
+       */
+      keyword?: any;
+      /**
+       * @description id集合
+       * @example { ids: 1,2,3 }
+       */
+      ids?: any;
+    }
     body: {}
-    response: { total: number; items: { name: string; gender: string; age: number; id: string }[] }
+    response: {
+      /**
+       * @description 总数
+       */
+      total: number
+      /**
+       * 数据集
+       */
+      items: {
+        /**
+         * @description 用户名称
+         */
+        name: string
+        /**
+         * @description 性别
+         */
+        gender: string
+        /**
+         * @description 年龄
+         */
+        age: number
+        /**
+         * @description id
+         */
+        id: string
+      }[]
+    }
   }
   '用户@用户详情': {
-    params: { id: any }
+    params: {
+      /**
+       * @description 用户id
+       * @example { id: 123 }
+       */
+      id: any;
+    }
     query: {}
     body: {}
-    response: { name?: string; gender?: string; age?: number; id: string }
+    response: {
+      /**
+       * @description 用户名称
+       */
+      name?: string
+      gender?: string
+      /**
+       * @description 年龄
+       */
+      age?: number
+      id: string
+    }
   }
   '用户@获取用户关注的人数': {
-    params: { id: any }
+    params: {
+      id: any;
+    }
     query: {}
     body: {}
     response: number
@@ -43,26 +137,63 @@ export interface ServiceRequestAndResponseMap {
     params: {}
     query: {}
     body: {
+      /**
+       * @description 用户名
+       * @example { username: admin }
+       */
       username: string | number | boolean
+      /**
+       * @description 密码
+       * @example { password: pws }
+       */
       password: string | number | boolean
+      /**
+       * @description 记住我
+       * @example { rememberMe: 1 }
+       */
       rememberMe?: string | number | boolean
     }
-    response: { token: string; id?: string }
+    response: {
+      /**
+       * token
+       * @description access token
+       */
+      token: string
+      /**
+       * @description id
+       */
+      id?: string
+    }
+  }
+  'thing@vote': {
+    params: {
+      /**
+       * @description Thing id
+       */
+      id: any;
+      /**
+       * @description User id
+       */
+      userId: any;
+    }
+    query: {}
+    body: {}
+    response: {}
   }
 }
 
+export type ServiceKeys = keyof ServiceRequestAndResponseMap
+
 export type ServiceReturn = {
   [P in ServiceKeys]: (
-    data: ServiceRequestAndResponseMap[P]['body'] &
+    data?: ServiceRequestAndResponseMap[P]['body'] &
       ServiceRequestAndResponseMap[P]['params'] &
       ServiceRequestAndResponseMap[P]['query'],
     body?: ServiceRequestAndResponseMap[P]['body']
   ) => Promise<ServiceFunctionResponse<ServiceRequestAndResponseMap[P]['response']>>
 }
 
-export type ServiceKeys = keyof ServiceRequestAndResponseMap
-
-export type ApiDefine = {
+export interface ApiDefine {
   u: string
   m: Method
   // params
@@ -95,5 +226,6 @@ export type RequestAdapter<T = unknown> = (
   method: Method,
   query: RequestQuery,
   body: RequestBody,
-  done?: boolean
+  extraParams: any,
+  done: boolean
 ) => Promise<ServiceFunctionResponse<T>>

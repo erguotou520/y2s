@@ -4,9 +4,8 @@ import { createServices } from './yapi.services'
 
 const token = localStorage.getItem('token')
 const services = createServices(
-  async (url: string, method: Method, query: RequestQuery, body: RequestBody, done = true) => {
+  async (url: string, method: Method, query: RequestQuery, body: RequestBody, extraParams, done = true) => {
     console.debug(url, method, query, body)
-    // return { error: false, data: {} }
     const { status, data, statusText } = await axios.request({
       url,
       method,
@@ -48,6 +47,6 @@ async function testAll() {
   await services['用户@修改用户信息']({ id: 123 }, { age: 23, name: '张三', gender: 1 })
   await services['用户@获取用户关注的人数']({ id: 123 })
   await services['认证@登录']({ username: 'root', password: '123456', rememberMe: true })
-  await services['认证@登出']({})
+  await services['认证@登出']()
 }
 testAll()

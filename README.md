@@ -52,6 +52,8 @@ module.exports = {
   saveJson: true,
   // [Optional, default: true] overwrite the static files(yapi.services.j/ts)? This is recommended, keep it true 是否覆盖固定生成的几个文件？一般不建议取消，保持文件最新
   overwrite: true,
+  // [Optional, default: false] wether to trim the api's group name and api's name 是否对api的分组名和名称进行trim
+  trim: false
 }
 ```
 

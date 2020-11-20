@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { RequestAdapter, ServiceKeys, ServiceReturn } from './yapi.api'
 import { apis } from './yapi.apis'
 
@@ -7,14 +8,17 @@ export function createServices(createFunc: RequestAdapter): ServiceReturn {
   for (key in apis) {
     const api = apis[key]
     // @ts-ignore
-    ret[key] = (payload?: { [key: string]: any } = {}, extraParams?: any) => {
+    ret[key] = (payload: { [key: string]: any }, extraParams?: any) => {
       let url = api.u
       const body = { ...payload }
       // params
       if (api.p?.length) {
         api.p.forEach(paramKey => {
           delete body[paramKey]
-          url = url.replace(new RegExp(`:${paramKey}|{${paramKey}}`, 'g'), payload[paramKey])
+          url = url.replace(
+            new RegExp(`:${paramKey}|{${paramKey}}`, 'g'),
+            payload[paramKey]
+          )
         })
       }
       // query
@@ -27,7 +31,7 @@ export function createServices(createFunc: RequestAdapter): ServiceReturn {
           }
         })
       }
-      return createFunc(url, api.m, query, body, extraParams)
+      return createFunc(url, api.m, query, body, extraParams, api.d > 0)
     }
   }
   return ret as ServiceReturn

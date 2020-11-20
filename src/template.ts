@@ -11,11 +11,14 @@ module.exports = {
   // wether to save the origin yapi api json response to file 是否保存api.json文件
   saveJson: true,
   // overwrite the static files? This is recommended, keep it true 是否覆盖固定生成的几个文件？一般不建议取消，保持文件最新
-  overwrite: true
+  overwrite: true,
+  // [Optional, default: false] wether to trim the api's group name and api's name 是否对api的分组名和名称进行trim
+  trim: false
 }
 `
 
-export const apiDescriptionFileTemplate = `export type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'HEAD' | 'OPTIONS' | 'PATCH'
+export const apiDescriptionFileTemplate = `/* eslint-disable */
+export type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'HEAD' | 'OPTIONS' | 'PATCH'
 
 export interface ServiceRequestAndResponseMap {
   $$1
