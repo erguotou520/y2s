@@ -166,7 +166,11 @@ export function convertApiToService(apis: OriginApis, config: ConfigRC): Service
       if (sameTitleApi) {
         // method也一致
         if (sameTitleApi.method === api.method) {
-          console.error(`\x1B[41m\x1B[37mFind same api: ${group.name}@${api.title}, previous api will be overwritten!!!\x1B[0m\x1B[0m`)
+          // 相同title的只提示一次
+          if (!sameTitleCacheMap[key]) {
+            sameTitleCacheMap[key] = 1
+            console.error(`\x1B[41m\x1B[37mFind same api: ${group.name}@${api.title}, previous api(s) will be overwritten!!!\x1B[0m\x1B[0m`)
+          }
         } else {
           // 相同title的只提示一次
           if (!sameTitleCacheMap[key]) {
