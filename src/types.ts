@@ -6,6 +6,7 @@ export interface ConfigRC {
   saveJson?: boolean
   overwrite?: boolean
   trim?: boolean
+  ignoreFiles: string[]
 }
 
 export type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'HEAD' | 'OPTIONS' | 'PATCH'

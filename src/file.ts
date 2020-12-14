@@ -2,6 +2,7 @@ import { writeFileSync } from 'fs'
 import { ensureFileSync, existsSync } from 'fs-extra'
 import { prompt } from 'inquirer'
 import { resolve, parse } from 'path'
+import { readConfig } from './config'
 
 const pwd = process.cwd()
 export const configFilePath = resolve(pwd, '.y2src.js')
@@ -38,13 +39,24 @@ export async function writeToFile(
   rewriteMsg?: string,
   overwrite = false
 ): Promise<boolean> {
-  try {
-    if (existsSync(filePath) && !overwrite) {
-      const { base } = parse(filePath)
+  const filename = parse(filePath).base
+  if (existsSync(filePath)) {
+    const config = readConfig()
+    // 判断该文件是否ignore
+    if (config?.ignoreFiles?.includes(filename)) {
+      return true
+    }
+    // 是否命令行设置了覆盖模式
+    if (overwrite) {
+      writeFileSync(filePath, content, {
+        encoding: 'utf8',
+      })
+      return true
+    } else {
       const ret = await prompt({
         type: 'confirm',
         name: 'rewrite',
-        message: rewriteMsg || `文件${base}已存在，是否覆盖？`,
+        message: rewriteMsg || `文件${filename}已存在，是否覆盖？`,
       })
       if (ret.rewrite) {
         writeFileSync(filePath, content, {
@@ -53,15 +65,12 @@ export async function writeToFile(
         return true
       }
       return false
-    } else {
-      ensureFileSync(filePath)
-      writeFileSync(filePath, content, {
-        encoding: 'utf8',
-      })
-      return true
     }
-  } catch (error) {
-    console.error(error)
-    process.exit(-1)
+  } else {
+    ensureFileSync(filePath)
+    writeFileSync(filePath, content, {
+      encoding: 'utf8',
+    })
+    return true
   }
 }

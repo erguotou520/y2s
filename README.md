@@ -12,6 +12,11 @@ If you wish to standardify the frontend api request, or change less code when ap
 - `y2s`默认对`typescript`友好，对 js 项目也有智能提示
 - `yapi`接口变动时你只需要执行一下`y2s update -y`即可
 
+## Change log 更新历史
+- 0.3.0
+  - Support `json` body type 支持`json`格式的body类型生成
+  - Support ignore some files when generating 支持通过配置忽略某些文件的生成
+
 ## Install 安装
 
 ```shell
@@ -53,7 +58,10 @@ module.exports = {
   // [Optional, default: true] overwrite the static files(yapi.services.j/ts)? This is recommended, keep it true 是否覆盖固定生成的几个文件？一般不建议取消，保持文件最新
   overwrite: true,
   // [Optional, default: false] wether to trim the api's group name and api's name 是否对api的分组名和名称进行trim
-  trim: false
+  trim: false,
+  // [Optional, default: []] files to ignore when generating 生成时可忽略的文件集合
+  // eg: ['yapi.services.ts']
+  ignoreFiles: []
 }
 ```
 
