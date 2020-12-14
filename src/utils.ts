@@ -1,5 +1,5 @@
-import { JSONSchema4, JSONSchema4TypeName } from 'json-schema'
-import { ConfigRC, Method, OriginApis, ReqBodyForm, ReqParam, ReqQuery } from './types'
+import { JSONSchema4 } from 'json-schema'
+import { ApiItem, ConfigRC, Method, OriginApis, ReqBodyForm, ReqParam, ReqQuery } from './types'
 
 const STRING_PROTOTYPE = '[object String]'
 const NUMBER_PROTOTYPE = '[object Number]'
@@ -79,24 +79,12 @@ export function wrapNewline(str: string | undefined, spaceBefore: number, withPr
   return ''
 }
 
-const typeMap: {
-  [key in JSONSchema4TypeName]: string
-} = {
-  number: 'number',
-  integer: 'number',
-  string: 'string',
-  boolean: 'boolean',
-  null: 'null',
-  any: 'any',
-  array: 'array',
-  object: 'object',
-}
-
 /**
  * 将Json Schema格式的返回值转换成我们需要的格式
  * @param json json schema格式的数据
+ * @param spaceBefore 前置空格数
  */
-export function converJSONSchemaToResponseStruct(json: JSONSchema4, spaceBefore: number): string {
+export function converJSONSchemaToTypescriptStruct(json: JSONSchema4, spaceBefore: number): string {
   let type
   if (typeof json.type === 'string') {
     type = json.type
@@ -118,7 +106,7 @@ export function converJSONSchemaToResponseStruct(json: JSONSchema4, spaceBefore:
           // key
           const fieldKey = /^\w+$/.test(key) ? key : `'${key}'`
           // 如果非纯字母+数字，需要套一层引号
-          return `${comments}${fieldKey}${requiredFields.includes(key) ? '' : '?'}: ${converJSONSchemaToResponseStruct(
+          return `${comments}${fieldKey}${requiredFields.includes(key) ? '' : '?'}: ${converJSONSchemaToTypescriptStruct(
             prop,
             spaceBefore + 2
           )}`
@@ -128,21 +116,66 @@ export function converJSONSchemaToResponseStruct(json: JSONSchema4, spaceBefore:
     )}}`
   }
   if (json.type === 'array') {
-    return `${converJSONSchemaToResponseStruct(json.items!, spaceBefore)}[]`
+    return `${converJSONSchemaToTypescriptStruct(json.items!, spaceBefore)}[]`
   }
   return type
 }
 
-interface ServiceConvertResult {
-  [key: string]: {
-    url: string
-    method: Method
-    query?: ReqQuery[]
-    params?: ReqParam[]
-    body?: ReqBodyForm[]
-    resp?: JSONSchema4
-    done: boolean
+/**
+ * 对接口数据中的body做转化
+ * @param api 接口返回数据
+ */
+function getReqBody(api: ApiItem): ReqBodyForm[] | JSONSchema4 | string {
+  switch (api.req_body_type) {
+    case 'form':
+      return api.req_body_form;
+    case 'json':
+      if (!api.req_body_other) {
+        return 'null'
+      }
+      return JSON.parse(api.req_body_other) as JSONSchema4
+    case 'file':
+      return 'null'
+    default:
+      return 'any';
   }
+}
+
+const FormTypeMap = { text: 'string | number | boolean', file: 'File' }
+
+/**
+ * 将body转化为字符串
+ * @param api 待转化的service item
+ * @param spaceBefore 前置空格数
+ */
+export function convertBodyToString(api: ServiceItem, spaceBefore: number): string {
+  if (api.type === 'form') {
+    return '{' + wrapNewline((api.body as ReqBodyForm[])?.map(b => {
+      return `${generateCommonComment(b)}${b.name}${Number(b.required) > 0 ? '' : '?'}: ${
+        FormTypeMap[b.type as 'file' | 'text'] ?? 'any'
+      }`
+    }).join('\n'), spaceBefore) + '}'
+  }
+  if (api.type === 'json') {
+    return converJSONSchemaToTypescriptStruct(api.body as JSONSchema4, spaceBefore)
+  }
+  return api.body as string
+}
+
+interface ServiceItem {
+  url: string
+  method: Method
+  query?: ReqQuery[]
+  params?: ReqParam[]
+  // 暂时不支持raw格式的数据处理
+  type?: 'json' | 'form' | 'file' | 'raw'
+  body?: ReqBodyForm[] | JSONSchema4 | string
+  resp?: JSONSchema4
+  done: boolean
+}
+
+interface ServiceConvertResult {
+  [key: string]: ServiceItem
 }
 
 /**
@@ -186,7 +219,8 @@ export function convertApiToService(apis: OriginApis, config: ConfigRC): Service
         method: api.method,
         query: api.req_query ?? [],
         params: api.req_params ?? [],
-        body: api.req_body_form ?? [],
+        type: api.req_body_type,
+        body: getReqBody(api),
         resp: resBody,
         done: api.status === 'done',
       }
@@ -237,4 +271,27 @@ export function generateComment(commentItems: CommentItem[], spaceBefore: number
   arr.push(`${prefixSpace} */`)
   arr.push(prefixSpace)
   return arr.join('\n')
+}
+
+interface CommonCommentItem {
+  name: string
+  item?: string
+  title?: string
+  desc?: string
+  example?: string
+}
+
+/**
+ * 为通用对象生成注释
+ * @param item 待生成注释的对象
+ */
+export function generateCommonComment(item: CommonCommentItem): string {
+  return generateComment(
+    [
+      { value: item.title },
+      { symbol: 'description', value: item.desc },
+      { symbol: 'example', value: item.example ? `{ ${item.name}: ${item.example} }` : '' },
+    ],
+    4
+  )
 }

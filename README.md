@@ -96,6 +96,8 @@ const services = createServices(
       responseType: 'json',
       headers: token
         ? {
+            // upload service using 'form-data' while other apis using 'json'
+            ContentType: url === '/upload' ? 'multipart/form-data' : 'application/json',
             Authorization: `Bearer ${token}`,
           }
         : {},

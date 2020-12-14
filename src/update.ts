@@ -9,7 +9,7 @@ import {
   serviceFilePath,
   writeToFile,
 } from './file'
-import { convertApiToService, generateComment, removeJsConvertSymbols, wrapNewline } from './utils'
+import { convertApiToService, convertBodyToString, generateCommonComment, removeJsConvertSymbols, wrapNewline } from './utils'
 import {
   apiDescriptionFileTemplate,
   apisFileTemplate,
@@ -18,33 +18,11 @@ import {
   apiDescTemplate,
   serviceDescriptionFileTemplate,
 } from './template'
-import { converJSONSchemaToResponseStruct, wrapSpace } from './utils'
-
-const FormTypeMap = { text: 'string | number | boolean', file: 'File' }
+import { converJSONSchemaToTypescriptStruct } from './utils'
 
 interface UpdateArgs {
   overwrite: boolean
   usingJs: boolean
-}
-
-interface CommonCommentItem {
-  name: string
-  desc?: string
-  example?: string
-}
-
-/**
- * 为通用对象生成注释
- * @param item 待生成注释的对象
- */
-export function generateCommonComment(item: CommonCommentItem): string {
-  return generateComment(
-    [
-      { symbol: 'description', value: item.desc },
-      { symbol: 'example', value: item.example ? `{ ${item.name}: ${item.example} }` : '' },
-    ],
-    4
-  )
 }
 
 // 更新数据
@@ -105,21 +83,9 @@ export async function update({ overwrite, usingJs = false }: UpdateArgs) {
                     ) ?? ''
                   )
                   // body
-                  .replace(
-                    '$$b',
-                    wrapNewline(
-                      api.body
-                        ?.map(b => {
-                          return `${generateCommonComment(b)}${b.name}${Number(b.required) > 0 ? '' : '?'}: ${
-                            FormTypeMap[b.type as 'file' | 'text'] ?? 'any'
-                          }`
-                        })
-                        .join('\n'),
-                      4
-                    ) ?? ''
-                  )
+                  .replace('$$b', convertBodyToString(api, 4) ?? '')
                   // response
-                  .replace('$$r', converJSONSchemaToResponseStruct(api.resp || {}, 4))
+                  .replace('$$r', converJSONSchemaToTypescriptStruct(api.resp || {}, 4))
               )
               return arr
             }, [])

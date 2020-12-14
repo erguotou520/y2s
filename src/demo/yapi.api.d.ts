@@ -186,9 +186,11 @@ export type ServiceKeys = keyof ServiceRequestAndResponseMap
 
 export type ServiceReturn = {
   [P in ServiceKeys]: (
-    data?: ServiceRequestAndResponseMap[P]['body'] &
+    data?: FormData | (
+      ServiceRequestAndResponseMap[P]['body'] &
       ServiceRequestAndResponseMap[P]['params'] &
-      ServiceRequestAndResponseMap[P]['query'],
+      ServiceRequestAndResponseMap[P]['query']
+    ),
     body?: ServiceRequestAndResponseMap[P]['body']
   ) => Promise<ServiceFunctionResponse<ServiceRequestAndResponseMap[P]['response']>>
 }

@@ -46,7 +46,7 @@ export interface ReqBodyForm {
   desc?: string
 }
 
-export interface List {
+export interface ApiItem {
   query_path: QueryPath
   edit_uid: number
   status: 'done' | 'undone'
@@ -75,6 +75,7 @@ export interface List {
   up_time: number
   __v: number
   req_body_type: 'form' | 'json' | 'file' | 'raw'
+  req_body_other: string
 }
 
 export interface OriginApiDesc {
@@ -83,7 +84,7 @@ export interface OriginApiDesc {
   desc?: string
   add_time: number
   up_time: number
-  list: List[]
+  list: ApiItem[]
 }
 
 export type OriginApis = OriginApiDesc[]
