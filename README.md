@@ -13,7 +13,7 @@ If you wish to standardify the frontend api request, or change less code when ap
 - `yapi`接口变动时你只需要执行一下`y2s update -y`即可
 
 ## Change log 更新历史
-- 0.3.0
+- 0.4.0
   - Support `json` body type 支持`json`格式的body类型生成
   - Support ignore some files when generating 支持通过配置忽略某些文件的生成
 
