@@ -192,7 +192,7 @@ export function convertApiToService(apis: OriginApis, config: ConfigRC): Service
       let key = `${group.name}@${api.title}`
       // trim
       if (config.trim) {
-        key = key.trim()
+        key = key.replace(/ /g, '')
       }
       // 重名时试图添加method
       const sameTitleApi = group.list.find(_api => _api !== api && _api.title === api.title)
