@@ -8,7 +8,7 @@ export interface ServiceRequestAndResponseMap {
        * @description 用户id
        * @example { id: 123 }
        */
-      id: any;
+      id: any
     }
     query: {}
     body: {
@@ -47,6 +47,27 @@ export interface ServiceRequestAndResponseMap {
       id?: string
     }
   }
+  '用户@注册用户': {
+    params: {}
+    query: {}
+    body: {
+      /**
+       * 姓名
+       */
+      name: string
+      /**
+       * 密码
+       * @description 6-8位
+       */
+      password: string
+      /**
+       * 年龄
+       * @description 15-120
+       */
+      age: number
+    }
+    response: string
+  }
   '用户@用户列表': {
     params: {}
     query: {
@@ -54,18 +75,18 @@ export interface ServiceRequestAndResponseMap {
        * @description 当前页
        * @example { page: 1 }
        */
-      page: any;
-      pageSize: any;
+      page: any
+      pageSize: any
       /**
        * @description 搜索关键词
        * @example { keyword: 张 }
        */
-      keyword?: any;
+      keyword?: any
       /**
        * @description id集合
        * @example { ids: 1,2,3 }
        */
-      ids?: any;
+      ids?: any
     }
     body: {}
     response: {
@@ -102,7 +123,7 @@ export interface ServiceRequestAndResponseMap {
        * @description 用户id
        * @example { id: 123 }
        */
-      id: any;
+      id: any
     }
     query: {}
     body: {}
@@ -121,7 +142,7 @@ export interface ServiceRequestAndResponseMap {
   }
   '用户@获取用户关注的人数': {
     params: {
-      id: any;
+      id: any
     }
     query: {}
     body: {}
@@ -170,15 +191,21 @@ export interface ServiceRequestAndResponseMap {
       /**
        * @description Thing id
        */
-      id: any;
+      id: any
       /**
        * @description User id
        */
-      userId: any;
+      userId: any
     }
     query: {}
     body: {}
     response: {}
+  }
+  '上传@通用上传': {
+    params: {}
+    query: {}
+    body: FormData
+    response: string
   }
 }
 
@@ -186,11 +213,9 @@ export type ServiceKeys = keyof ServiceRequestAndResponseMap
 
 export type ServiceReturn = {
   [P in ServiceKeys]: (
-    data?: FormData | (
-      ServiceRequestAndResponseMap[P]['body'] &
+    data?: ServiceRequestAndResponseMap[P]['body'] &
       ServiceRequestAndResponseMap[P]['params'] &
-      ServiceRequestAndResponseMap[P]['query']
-    ),
+      ServiceRequestAndResponseMap[P]['query'],
     body?: ServiceRequestAndResponseMap[P]['body']
   ) => Promise<ServiceFunctionResponse<ServiceRequestAndResponseMap[P]['response']>>
 }

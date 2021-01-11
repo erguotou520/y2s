@@ -106,10 +106,9 @@ export function converJSONSchemaToTypescriptStruct(json: JSONSchema4, spaceBefor
           // key
           const fieldKey = /^\w+$/.test(key) ? key : `'${key}'`
           // 如果非纯字母+数字，需要套一层引号
-          return `${comments}${fieldKey}${requiredFields.includes(key) ? '' : '?'}: ${converJSONSchemaToTypescriptStruct(
-            prop,
-            spaceBefore + 2
-          )}`
+          return `${comments}${fieldKey}${
+            requiredFields.includes(key) ? '' : '?'
+          }: ${converJSONSchemaToTypescriptStruct(prop, spaceBefore + 2)}`
         })
         .join('\n'),
       spaceBefore
@@ -125,19 +124,17 @@ export function converJSONSchemaToTypescriptStruct(json: JSONSchema4, spaceBefor
  * 对接口数据中的body做转化
  * @param api 接口返回数据
  */
-function getReqBody(api: ApiItem): ReqBodyForm[] | JSONSchema4 | string {
+function getReqBody(api: ApiItem): ReqBodyForm[] | JSONSchema4 | null {
   switch (api.req_body_type) {
     case 'form':
-      return api.req_body_form;
+      return api.req_body_form
     case 'json':
       if (!api.req_body_other) {
-        return 'null'
+        return null
       }
       return JSON.parse(api.req_body_other) as JSONSchema4
-    case 'file':
-      return 'null'
     default:
-      return 'any';
+      return null
   }
 }
 
@@ -150,16 +147,32 @@ const FormTypeMap = { text: 'string | number | boolean', file: 'File' }
  */
 export function convertBodyToString(api: ServiceItem, spaceBefore: number): string {
   if (api.type === 'form') {
-    return '{' + wrapNewline((api.body as ReqBodyForm[])?.map(b => {
-      return `${generateCommonComment(b)}${b.name}${Number(b.required) > 0 ? '' : '?'}: ${
-        FormTypeMap[b.type as 'file' | 'text'] ?? 'any'
-      }`
-    }).join('\n'), spaceBefore) + '}'
+    if ((api.body as ReqBodyForm[])?.some(item => item.type === 'file')) {
+      return 'FormData'
+    }
+    return (
+      '{' +
+      wrapNewline(
+        (api.body as ReqBodyForm[])
+          ?.map(b => {
+            return `${generateCommonComment(b)}${b.name}${Number(b.required) > 0 ? '' : '?'}: ${
+              FormTypeMap[b.type as 'file' | 'text'] ?? '{}'
+            }`
+          })
+          .join('\n'),
+        spaceBefore
+      ) +
+      '}'
+    )
   }
   if (api.type === 'json') {
-    return converJSONSchemaToTypescriptStruct(api.body as JSONSchema4, spaceBefore)
+    if (api.body) {
+      return converJSONSchemaToTypescriptStruct(api.body as JSONSchema4, spaceBefore)
+    }
+    // 为null时返回空
+    return '{}'
   }
-  return api.body as string
+  return '{}'
 }
 
 interface ServiceItem {
@@ -169,7 +182,7 @@ interface ServiceItem {
   params?: ReqParam[]
   // 暂时不支持raw格式的数据处理
   type?: 'json' | 'form' | 'file' | 'raw'
-  body?: ReqBodyForm[] | JSONSchema4 | string
+  body?: ReqBodyForm[] | JSONSchema4 | null
   resp?: JSONSchema4
   done: boolean
 }
@@ -202,13 +215,17 @@ export function convertApiToService(apis: OriginApis, config: ConfigRC): Service
           // 相同title的只提示一次
           if (!sameTitleCacheMap[key]) {
             sameTitleCacheMap[key] = 1
-            console.error(`\x1B[41m\x1B[37mFind same api: ${group.name}@${api.title}, previous api(s) will be overwritten!!!\x1B[0m\x1B[0m`)
+            console.error(
+              `\x1B[41m\x1B[37mFind same api: ${group.name}@${api.title}, previous api(s) will be overwritten!!!\x1B[0m\x1B[0m`
+            )
           }
         } else {
           // 相同title的只提示一次
           if (!sameTitleCacheMap[key]) {
             sameTitleCacheMap[key] = 1
-            console.warn(`\x1B[33mFind same api with different method: ${group.name}@${api.title}, will add @{method} suffix.\x1B[0m`)
+            console.warn(
+              `\x1B[33mFind same api with different method: ${group.name}@${api.title}, will add @{method} suffix.\x1B[0m`
+            )
           }
         }
         // 添加method

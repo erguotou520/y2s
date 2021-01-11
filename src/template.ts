@@ -30,11 +30,10 @@ export type ServiceKeys = keyof ServiceRequestAndResponseMap
 
 export type ServiceReturn = {
   [P in ServiceKeys]: (
-    data?: FormData | (
-      ServiceRequestAndResponseMap[P]['body'] &
+    data?: ServiceRequestAndResponseMap[P]['body'] &
       ServiceRequestAndResponseMap[P]['params'] &
       ServiceRequestAndResponseMap[P]['query']
-    ),
+    ,
     body?: ServiceRequestAndResponseMap[P]['body']
   ) => Promise<ServiceFunctionResponse<ServiceRequestAndResponseMap[P]['response']>>
 }
@@ -89,7 +88,7 @@ export const servicesFileTemplate = `/* eslint-disable */
 *#import { RequestAdapter, ServiceKeys, ServiceReturn } from './yapi.api'
 #*import { apis } from './yapi.apis'
 *#
-type PayloadData = { [key: string]: any }#*
+type PayloadData = Record<string | number, any>#*
 
 export function createServices(createFunc*#: RequestAdapter#*)*#: ServiceReturn#* {
   const ret = {}*# as ServiceReturn#*
@@ -101,18 +100,15 @@ export function createServices(createFunc*#: RequestAdapter#*)*#: ServiceReturn#
       let url = api.u
       let body*#: PayloadData | FormData#*
       let query*#: PayloadData#* = {}
-      if (payload instanceof FormData) {
+      if (FormData && payload instanceof FormData) {
         body = payload
       } else {
-        const _body = { ...(payload || {}) }
+        const _body*#: PayloadData#* = { ...(payload || {}) }
         // params
         if (api.p?.length) {
           api.p.forEach(paramKey => {
             delete _body[paramKey]
-            url = url.replace(
-              new RegExp(\`:\${paramKey}|{\${paramKey}}\`, 'g'),
-              payload[paramKey]
-            )
+            url = url.replace(new RegExp(\`:\${paramKey}|{\${paramKey}}\`, 'g'),*#(#*payload*# as PayloadData)#*[paramKey])
           })
         }
         // query
@@ -120,7 +116,7 @@ export function createServices(createFunc*#: RequestAdapter#*)*#: ServiceReturn#
           api.q.forEach(queryKey => {
             if (queryKey in payload) {
               delete _body[queryKey]
-              query[queryKey] = payload[queryKey]
+              query[queryKey] = *#(#*payload*# as PayloadData)#*[queryKey]
             }
           })
         }

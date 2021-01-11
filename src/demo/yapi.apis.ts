@@ -6,40 +6,50 @@ export const apis: Apis = {
     u: '/users/:id',
     m: 'POST',
     p: ['id'],
-    d: 0
+    d: 0,
+  },
+  '用户@注册用户': {
+    u: '/register',
+    m: 'POST',
+    d: 0,
   },
   '用户@用户列表': {
     u: '/users',
     m: 'GET',
     q: ['page', 'pageSize', 'keyword', 'ids'],
-    d: 0
+    d: 0,
   },
   '用户@用户详情': {
     u: '/users/:id',
     m: 'GET',
     p: ['id'],
-    d: 0
+    d: 0,
   },
   '用户@获取用户关注的人数': {
     u: '/users/:id/starsCount',
     m: 'GET',
     p: ['id'],
-    d: 0
+    d: 0,
   },
   '认证@登出': {
     u: '/logout',
     m: 'POST',
-    d: 1
+    d: 1,
   },
   '认证@登录': {
     u: '/login',
     m: 'POST',
-    d: 1
+    d: 1,
   },
   'thing@vote': {
     u: '/thing/:id/:userId/vote',
     m: 'GET',
     p: ['id', 'userId'],
-    d: 0
-  }
+    d: 0,
+  },
+  '上传@通用上传': {
+    u: '/upload',
+    m: 'POST',
+    d: 1,
+  },
 }

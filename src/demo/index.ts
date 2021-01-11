@@ -47,5 +47,6 @@ async function testAll() {
   await services['用户@获取用户关注的人数']({ id: 123 })
   await services['认证@登录']({ username: 'root', password: '123456', rememberMe: true })
   await services['认证@登出']()
+  await services['上传@通用上传'](new FormData())
 }
 testAll()

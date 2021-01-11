@@ -9,7 +9,13 @@ import {
   serviceFilePath,
   writeToFile,
 } from './file'
-import { convertApiToService, convertBodyToString, generateCommonComment, removeJsConvertSymbols, wrapNewline } from './utils'
+import {
+  convertApiToService,
+  convertBodyToString,
+  generateCommonComment,
+  removeJsConvertSymbols,
+  wrapNewline,
+} from './utils'
 import {
   apiDescriptionFileTemplate,
   apisFileTemplate,
@@ -83,7 +89,7 @@ export async function update({ overwrite, usingJs = false }: UpdateArgs) {
                     ) ?? ''
                   )
                   // body
-                  .replace('$$b', convertBodyToString(api, 4) ?? '')
+                  .replace('$$b', convertBodyToString(api, 4) ?? '{}')
                   // response
                   .replace('$$r', converJSONSchemaToTypescriptStruct(api.resp || {}, 4))
               )
