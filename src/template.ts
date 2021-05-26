@@ -1,3 +1,6 @@
+/**
+ * .y2src.js
+ */
 export const initConfigFileTemplate = `/* eslint-disable */
 module.exports = {
   // yapi prefix yapi地址前缀
@@ -19,14 +22,22 @@ module.exports = {
 }
 `
 
-export const apiDescriptionFileTemplate = `/* eslint-disable */
-export type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'HEAD' | 'OPTIONS' | 'PATCH'
-
-export interface ServiceRequestAndResponseMap {
+/**
+ * yapi.service.keys.d.ts
+ */
+export const serviceKeysDescriptionFileTemplate = `export interface ServiceRequestAndResponseMap {
   $$1
 }
 
 export type ServiceKeys = keyof ServiceRequestAndResponseMap
+`
+
+/**
+ * yapi.request.d.ts
+ */
+export const serviceRequestDescriptionFileTemplate = `import { ServiceKeys, ServiceRequestAndResponseMap } from './yapi.service.keys'
+/* eslint-disable */
+export type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'HEAD' | 'OPTIONS' | 'PATCH'
 
 export type ServiceReturn = {
   [P in ServiceKeys]: (
@@ -76,16 +87,23 @@ export type RequestAdapter<T = unknown> = (
 ) => Promise<ServiceFunctionResponse<T>>
 `
 
+/**
+ * yapi.apis.ts
+ */
 export const apisFileTemplate = `/* eslint-disable */
-*#import { Apis } from './yapi.api'
+*#import { Apis } from './yapi.request'
 
 #*export const apis*#: Apis#* = {
   $$1
 }
 `
 
+/**
+ * yapi.service.ts
+ */
 export const servicesFileTemplate = `/* eslint-disable */
-*#import { RequestAdapter, ServiceKeys, ServiceReturn } from './yapi.api'
+*#import { RequestAdapter, ServiceReturn } from './yapi.request'
+import { ServiceKeys } from './yapi.service.keys'
 #*import { apis } from './yapi.apis'
 *#
 type PayloadData = Record<string | number, any>#*
@@ -129,7 +147,7 @@ export function createServices(createFunc*#: RequestAdapter#*)*#: ServiceReturn#
 }
 `
 
-export const serviceDescriptionFileTemplate = `import { RequestAdapter, ServiceReturn } from './yapi.api'
+export const serviceDescriptionFileTemplate = `import { RequestAdapter, ServiceReturn } from './yapi.request'
 
 export function createServices(createFunc: RequestAdapter): ServiceReturn
 `

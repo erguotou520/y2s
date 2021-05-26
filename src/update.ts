@@ -3,10 +3,12 @@ import { readConfig } from './config'
 import { fetchJson } from './fetch'
 import {
   apiDescriptionFilePath,
+  apiRequestDescriptionFilePath,
   apisFilePath,
   initFilePath,
   serviceDescriptionFilePath,
   serviceFilePath,
+  serviceKeysDescriptionFilePath,
   writeToFile,
 } from './file'
 import {
@@ -17,12 +19,13 @@ import {
   wrapNewline,
 } from './utils'
 import {
-  apiDescriptionFileTemplate,
+  serviceKeysDescriptionFileTemplate,
   apisFileTemplate,
   servicesFileTemplate,
   requestAndResponseMapTemplate,
   apiDescTemplate,
   serviceDescriptionFileTemplate,
+  serviceRequestDescriptionFileTemplate,
 } from './template'
 import { converJSONSchemaToTypescriptStruct } from './utils'
 
@@ -41,22 +44,22 @@ export async function update({ overwrite, usingJs = false }: UpdateArgs) {
       // 初始化service目录的相关文件的存储路径
       // 根据api获取service配置数据
       const services = convertApiToService(apiJson, config)
-      // yapi.services.ts文件名称
+      // 1. yapi.services.ts文件名称
       const serviceFileName = usingJs ? serviceFilePath.replace(/\.ts$/, '.js') : serviceFilePath
       // 根据配置项来判断是否覆盖yapi.services.ts文件
       if (config.overwrite !== false || !existsSync(serviceFileName)) {
         // 生成yapi.services.ts文件
         await writeToFile(serviceFileName, removeJsConvertSymbols(servicesFileTemplate, usingJs), undefined, overwrite)
-        // js项目还需要生成yapi.services.d.ts文件
+        // 1.1 js项目还需要生成yapi.services.d.ts文件
         if (usingJs) {
           await writeToFile(serviceDescriptionFilePath, serviceDescriptionFileTemplate, undefined, overwrite)
         }
       }
-      // 生成yapi.api.d.ts文件
+      // 2. 生成yapi.service.keys.d.ts文件
       const serviceKeys = Object.keys(services)
       await writeToFile(
-        apiDescriptionFilePath,
-        apiDescriptionFileTemplate.replace(
+        serviceKeysDescriptionFilePath,
+        serviceKeysDescriptionFileTemplate.replace(
           '$$1',
           serviceKeys
             .reduce<string[]>((arr, key) => {
@@ -100,7 +103,11 @@ export async function update({ overwrite, usingJs = false }: UpdateArgs) {
         undefined,
         overwrite
       )
-      // 生成yapi.apis.ts文件
+      // 3. 生成yapi.request.d.ts文件
+      if (config.overwrite !== false || !existsSync(apiRequestDescriptionFilePath)) {
+        await writeToFile(apiRequestDescriptionFilePath, serviceRequestDescriptionFileTemplate, undefined, overwrite)
+      }
+      // 4. 生成yapi.apis.ts文件
       await writeToFile(
         usingJs ? apisFilePath.replace(/\.ts$/, '.js') : apisFilePath,
         removeJsConvertSymbols(

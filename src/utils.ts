@@ -115,7 +115,12 @@ export function converJSONSchemaToTypescriptStruct(json: JSONSchema4, spaceBefor
     )}}`
   }
   if (json.type === 'array') {
-    return `${converJSONSchemaToTypescriptStruct(json.items!, spaceBefore)}[]`
+    try {
+      return `${converJSONSchemaToTypescriptStruct(json.items!, spaceBefore)}[]`
+    } catch (error) {
+      console.error('JSON schema解析失败！')
+      throw error
+    }
   }
   return type
 }
