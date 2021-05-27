@@ -14,6 +14,14 @@ If you wish to standardify the frontend api request, or change less code when ap
 
 ## Change log 更新历史
 
+- 0.4.4
+  - Support `hasFormData` and `dataPath` config 支持`hasFormData`和`dataPath`配置项
+- 0.4.3
+  - 将 service map 的数据和类型独立开来
+- 0.4.2
+  - 优化 formdata 的 ts 提示，去掉 body 的 any 类型，避免污染整个参数类型
+- 0.4.1
+  - 修复 trim 选项不去除中间空格的问题
 - 0.4.0
   - Support `json` body type 支持`json`格式的 body 类型生成
   - Support ignore some files when generating 支持通过配置忽略某些文件的生成
@@ -86,7 +94,7 @@ The generated service files are just http request wrapper, you need impletement 
 ```typescript
 //# src/services/index.ts
 import axios from 'axios'
-import { Method, RequestBody, RequestQuery } from './yapi.api'
+import { Method, RequestBody, RequestQuery } from './yapi.request'
 import { createServices } from './yapi.services'
 
 const token = localStorage.getItem('token')
@@ -151,3 +159,7 @@ service argument tips 请求参数提示
 
 service response tips 请求结果提示
 ![service response](./docs/resp.png)
+
+### 淘宝源主动更新
+
+https://npm.taobao.org/sync/y2s
