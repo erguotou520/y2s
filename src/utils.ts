@@ -1,4 +1,5 @@
 import { JSONSchema4 } from 'json-schema'
+import { readConfig } from './config'
 import { ApiItem, ConfigRC, Method, OriginApis, ReqBodyForm, ReqParam, ReqQuery } from './types'
 
 const STRING_PROTOTYPE = '[object String]'
@@ -153,7 +154,8 @@ const FormTypeMap = { text: 'string | number | boolean', file: 'File' }
 export function convertBodyToString(api: ServiceItem, spaceBefore: number): string {
   if (api.type === 'form') {
     if ((api.body as ReqBodyForm[])?.some(item => item.type === 'file')) {
-      return 'FormData'
+      const config = readConfig()
+      return config?.hasFormData === false ? 'any' : 'FormData'
     }
     return (
       '{' +

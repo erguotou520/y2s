@@ -1,6 +1,4 @@
 /* eslint-disable */
-export type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'HEAD' | 'OPTIONS' | 'PATCH'
-
 export interface ServiceRequestAndResponseMap {
   '用户@修改用户信息': {
     params: {
@@ -8,7 +6,7 @@ export interface ServiceRequestAndResponseMap {
        * @description 用户id
        * @example { id: 123 }
        */
-      id: any
+      id: any;
     }
     query: {}
     body: {
@@ -75,18 +73,18 @@ export interface ServiceRequestAndResponseMap {
        * @description 当前页
        * @example { page: 1 }
        */
-      page: any
-      pageSize: any
+      page: any;
+      pageSize: any;
       /**
        * @description 搜索关键词
        * @example { keyword: 张 }
        */
-      keyword?: any
+      keyword?: any;
       /**
        * @description id集合
        * @example { ids: 1,2,3 }
        */
-      ids?: any
+      ids?: any;
     }
     body: {}
     response: {
@@ -123,7 +121,7 @@ export interface ServiceRequestAndResponseMap {
        * @description 用户id
        * @example { id: 123 }
        */
-      id: any
+      id: any;
     }
     query: {}
     body: {}
@@ -142,7 +140,7 @@ export interface ServiceRequestAndResponseMap {
   }
   '用户@获取用户关注的人数': {
     params: {
-      id: any
+      id: any;
     }
     query: {}
     body: {}
@@ -191,11 +189,11 @@ export interface ServiceRequestAndResponseMap {
       /**
        * @description Thing id
        */
-      id: any
+      id: any;
       /**
        * @description User id
        */
-      userId: any
+      userId: any;
     }
     query: {}
     body: {}
@@ -210,49 +208,3 @@ export interface ServiceRequestAndResponseMap {
 }
 
 export type ServiceKeys = keyof ServiceRequestAndResponseMap
-
-export type ServiceReturn = {
-  [P in ServiceKeys]: (
-    data?: ServiceRequestAndResponseMap[P]['body'] &
-      ServiceRequestAndResponseMap[P]['params'] &
-      ServiceRequestAndResponseMap[P]['query'],
-    body?: ServiceRequestAndResponseMap[P]['body']
-  ) => Promise<ServiceFunctionResponse<ServiceRequestAndResponseMap[P]['response']>>
-}
-
-export interface ApiDefine {
-  u: string
-  m: Method
-  // params
-  p?: (string | number)[]
-  // query
-  q?: string[]
-  // done / undone
-  d: 0 | 1
-}
-
-export type Apis = Record<ServiceKeys, ApiDefine>
-
-export interface RequestQuery {
-  [key: string]: string | number | RequestQuery
-}
-
-export interface RequestBody {
-  [key: string]: any
-}
-
-export interface ServiceFunctionResponse<T = any> {
-  error: boolean
-  data: T | null | undefined
-  message?: string
-  stack?: string | object
-}
-
-export type RequestAdapter<T = unknown> = (
-  url: string,
-  method: Method,
-  query: RequestQuery,
-  body: RequestBody,
-  extraParams: any,
-  done: boolean
-) => Promise<ServiceFunctionResponse<T>>

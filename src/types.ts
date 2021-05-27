@@ -1,12 +1,24 @@
 export interface ConfigRC {
+  // yapi地址前缀
   apiPrefix: string
+  // yapi的项目token
   token: string
+  // yapi的项目id
   projectId: number
+  // 生成的service相关文件的存储位置
   outputPath: string
+  // 是否保存api.json文件
   saveJson?: boolean
+  // 是否覆盖固定生成的几个文件？一般不建议取消，保持文件最新
   overwrite?: boolean
+  // 是否对api的分组名和名称进行trim
   trim?: boolean
+  // 生成时可忽略的文件集合
   ignoreFiles: string[]
+  // 是否使用FormData
+  hasFormData?: boolean
+  // 解构response返回的数据层级
+  dataPath?: null | string | string[]
 }
 
 export type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'HEAD' | 'OPTIONS' | 'PATCH'

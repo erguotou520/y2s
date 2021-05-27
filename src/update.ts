@@ -2,7 +2,6 @@ import { existsSync } from 'fs-extra'
 import { readConfig } from './config'
 import { fetchJson } from './fetch'
 import {
-  apiDescriptionFilePath,
   apiRequestDescriptionFilePath,
   apisFilePath,
   initFilePath,
@@ -26,6 +25,7 @@ import {
   apiDescTemplate,
   serviceDescriptionFileTemplate,
   serviceRequestDescriptionFileTemplate,
+  servicesFileWithNoFormDataTemplate,
 } from './template'
 import { converJSONSchemaToTypescriptStruct } from './utils'
 
@@ -49,7 +49,15 @@ export async function update({ overwrite, usingJs = false }: UpdateArgs) {
       // 根据配置项来判断是否覆盖yapi.services.ts文件
       if (config.overwrite !== false || !existsSync(serviceFileName)) {
         // 生成yapi.services.ts文件
-        await writeToFile(serviceFileName, removeJsConvertSymbols(servicesFileTemplate, usingJs), undefined, overwrite)
+        await writeToFile(
+          serviceFileName,
+          removeJsConvertSymbols(
+            config.hasFormData === false ? servicesFileWithNoFormDataTemplate : servicesFileTemplate,
+            usingJs
+          ),
+          undefined,
+          overwrite
+        )
         // 1.1 js项目还需要生成yapi.services.d.ts文件
         if (usingJs) {
           await writeToFile(serviceDescriptionFilePath, serviceDescriptionFileTemplate, undefined, overwrite)
@@ -105,7 +113,15 @@ export async function update({ overwrite, usingJs = false }: UpdateArgs) {
       )
       // 3. 生成yapi.request.d.ts文件
       if (config.overwrite !== false || !existsSync(apiRequestDescriptionFilePath)) {
-        await writeToFile(apiRequestDescriptionFilePath, serviceRequestDescriptionFileTemplate, undefined, overwrite)
+        let requestFileContent = serviceRequestDescriptionFileTemplate
+        if (config.dataPath) {
+          let dataPath = Array.isArray(config.dataPath) ? config.dataPath : [config.dataPath]
+          requestFileContent = requestFileContent.replace(
+            /\[P\]\['response'\]/,
+            `[P]['response']['${dataPath.join("']['")}']`
+          )
+        }
+        await writeToFile(apiRequestDescriptionFilePath, requestFileContent, undefined, overwrite)
       }
       // 4. 生成yapi.apis.ts文件
       await writeToFile(

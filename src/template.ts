@@ -18,14 +18,20 @@ module.exports = {
   // [Optional, default: false] wether to trim the api's group name and api's name 是否对api的分组名和名称进行trim
   trim: false,
   // [Optional, default: []] files to ignore when generating 生成时可忽略的文件集合
-  ignoreFiles: []
+  // eg: ['yapi.services.ts']
+  ignoreFiles: [],
+  // [Optional, default: true] use FormData type or not 是否使用FormData，小程序不需要
+  hasFormData: true
+  // [Optional, default: null] de-structure response data types 解构response返回的数据层级，一般用于后端返回的数据有一层固定的包裹，比如 { data: {}, message: '', err_code: '' } 这种情况，此时设置为 'data' 将自动解构到 data 里面的具体数据，如果有多层包裹，请使用数组
+  dataPath: null
 }
 `
 
 /**
  * yapi.service.keys.d.ts
  */
-export const serviceKeysDescriptionFileTemplate = `export interface ServiceRequestAndResponseMap {
+export const serviceKeysDescriptionFileTemplate = `/* eslint-disable */
+export interface ServiceRequestAndResponseMap {
   $$1
 }
 
@@ -35,8 +41,8 @@ export type ServiceKeys = keyof ServiceRequestAndResponseMap
 /**
  * yapi.request.d.ts
  */
-export const serviceRequestDescriptionFileTemplate = `import { ServiceKeys, ServiceRequestAndResponseMap } from './yapi.service.keys'
-/* eslint-disable */
+export const serviceRequestDescriptionFileTemplate = `/* eslint-disable */
+import { ServiceKeys, ServiceRequestAndResponseMap } from './yapi.service.keys'
 export type Method = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'HEAD' | 'OPTIONS' | 'PATCH'
 
 export type ServiceReturn = {
@@ -147,7 +153,51 @@ export function createServices(createFunc*#: RequestAdapter#*)*#: ServiceReturn#
 }
 `
 
-export const serviceDescriptionFileTemplate = `import { RequestAdapter, ServiceReturn } from './yapi.request'
+/**
+ * yapi.service.ts with no FormData
+ */
+export const servicesFileWithNoFormDataTemplate = `/* eslint-disable */
+ *#import { RequestAdapter, ServiceReturn } from './yapi.request'
+ import { ServiceKeys } from './yapi.service.keys'
+ #*import { apis } from './yapi.apis'
+ *#
+ type PayloadData = Record<string | number, any>#*
+
+ export function createServices(createFunc*#: RequestAdapter#*)*#: ServiceReturn#* {
+   const ret = {}*# as ServiceReturn#*
+   let key*#: ServiceKeys#*
+   for (key in apis) {
+     const api = apis[key]
+     *#// @ts-ignore
+     #*ret[key] = (payload*#: PayloadData#*, extraParams*#?: any#*) => {
+       let url = api.u
+       let body*#: PayloadData#* = { ...(payload || {}) }
+       let query*#: PayloadData#* = {}
+        // params
+        if (api.p?.length) {
+          api.p.forEach(paramKey => {
+            delete body[paramKey]
+            url = url.replace(new RegExp(\`:\${paramKey}|{\${paramKey}}\`, 'g'),*#(#*payload*# as PayloadData)#*[paramKey])
+          })
+        }
+        // query
+        if (api.q?.length) {
+          api.q.forEach(queryKey => {
+            if (queryKey in payload) {
+              delete body[queryKey]
+              query[queryKey] = *#(#*payload*# as PayloadData)#*[queryKey]
+            }
+          })
+        }
+       return createFunc(url, api.m, query, body, extraParams, api.d > 0)
+     }
+   }
+   return ret*# as ServiceReturn#*
+ }
+ `
+
+export const serviceDescriptionFileTemplate = `/* eslint-disable */
+import { RequestAdapter, ServiceReturn } from './yapi.request'
 
 export function createServices(createFunc: RequestAdapter): ServiceReturn
 `

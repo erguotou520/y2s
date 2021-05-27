@@ -13,8 +13,9 @@ If you wish to standardify the frontend api request, or change less code when ap
 - `yapi`接口变动时你只需要执行一下`y2s update -y`即可
 
 ## Change log 更新历史
+
 - 0.4.0
-  - Support `json` body type 支持`json`格式的body类型生成
+  - Support `json` body type 支持`json`格式的 body 类型生成
   - Support ignore some files when generating 支持通过配置忽略某些文件的生成
 
 ## Install 安装
@@ -61,7 +62,11 @@ module.exports = {
   trim: false,
   // [Optional, default: []] files to ignore when generating 生成时可忽略的文件集合
   // eg: ['yapi.services.ts']
-  ignoreFiles: []
+  ignoreFiles: [],
+  // [Optional, default: true] use FormData type or not 是否使用FormData，小程序不需要
+  hasFormData: true
+  // [Optional, default: null] de-structure response data types 解构response返回的数据层级，一般用于后端返回的数据有一层固定的包裹，比如 { data: {}, message: '', err_code: '' } 这种情况，此时设置为 'data' 将自动解构到 data 里面的具体数据，如果有多层包裹，请使用数组
+  dataPath: null
 }
 ```
 

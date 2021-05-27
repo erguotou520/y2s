@@ -1,5 +1,6 @@
 import axios from 'axios'
-import { Method, RequestBody, RequestQuery } from './yapi.api'
+import { Method } from '../types'
+import { RequestBody, RequestQuery } from './yapi.request'
 import { createServices } from './yapi.services'
 
 const token = localStorage.getItem('token')

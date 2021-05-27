@@ -1,5 +1,6 @@
 /* eslint-disable */
-import { RequestAdapter, ServiceKeys, ServiceReturn } from './yapi.api'
+import { RequestAdapter, ServiceReturn } from './yapi.request'
+import { ServiceKeys } from './yapi.service.keys'
 import { apis } from './yapi.apis'
 
 type PayloadData = Record<string | number, any>
@@ -22,7 +23,7 @@ export function createServices(createFunc: RequestAdapter): ServiceReturn {
         if (api.p?.length) {
           api.p.forEach(paramKey => {
             delete _body[paramKey]
-            url = url.replace(new RegExp(`:${paramKey}|{${paramKey}}`, 'g'), (payload as PayloadData)[paramKey])
+            url = url.replace(new RegExp(`:${paramKey}|{${paramKey}}`, 'g'),(payload as PayloadData)[paramKey])
           })
         }
         // query
