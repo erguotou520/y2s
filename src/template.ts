@@ -21,7 +21,7 @@ module.exports = {
   // eg: ['yapi.services.ts']
   ignoreFiles: [],
   // [Optional, default: true] use FormData type or not 是否使用FormData，小程序不需要
-  hasFormData: true
+  hasFormData: true,
   // [Optional, default: null] de-structure response data types 解构response返回的数据层级，一般用于后端返回的数据有一层固定的包裹，比如 { data: {}, message: '', err_code: '' } 这种情况，此时设置为 'data' 将自动解构到 data 里面的具体数据，如果有多层包裹，请使用数组
   dataPath: null
 }
@@ -136,7 +136,7 @@ export function createServices(createFunc*#: RequestAdapter#*)*#: ServiceReturn#
           })
         }
         // query
-        if (api.q?.length) {
+        if (api.q?.length && payload) {
           api.q.forEach(queryKey => {
             if (queryKey in payload) {
               delete _body[queryKey]
