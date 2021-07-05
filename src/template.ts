@@ -2,6 +2,7 @@
  * .y2src.js
  */
 export const initConfigFileTemplate = `/* eslint-disable */
+/** @type {import('y2s/dist/types').ConfigRC} */
 module.exports = {
   // yapi prefix yapi地址前缀
   apiPrefix: 'https://yapi.your.company',
